@@ -3,6 +3,7 @@
 const simulation = {
     loop() { }, //main game loop, gets set to normal or testing loop
     normalLoop() {
+        localSettings.loreCount = 1;
         try {
             simulation.gravity();
             Engine.update(engine, simulation.delta);
@@ -21,7 +22,7 @@ const simulation = {
             mobs.draw();
             simulation.draw.cons();
             simulation.draw.body();
-            if (!m.isBodiesAsleep) mobs.loop();
+            if (!m.isBodiesAsle) mobs.loop();
             mobs.healthBar();
             m.draw();
             m.hold();
@@ -33,10 +34,12 @@ const simulation = {
             if (!m.isBodiesAsleep) b.bulletDo();
             simulation.drawCircle();
             simulation.runEphemera();
+            simulation.constructCycle()
             ctx.restore();
         } catch (error) {
             simulation.inGameConsole(`<strong style='color:red;'>ERROR:</strong> ${(error.stack && error.stack.replace(/\n/g, "<br>")) || (error.message + ` <u>${error.filename}:${error.lineno}</u>`)}`);
         } finally {
+            simulation.enableConstructMode();
             simulation.drawCursor();
         }
     },
@@ -76,6 +79,7 @@ const simulation = {
             simulation.inGameConsole(`<strong style='color:red;'>ERROR:</strong> ${(error.stack && error.stack.replace(/\n/g, "<br>")) || (error.message + ` <u>${error.filename}:${error.lineno}</u>`)}`);
         } finally {
             ctx.restore();
+            simulation.enableConstructMode();
             simulation.testingOutput();
             simulation.drawCursor();
         }
