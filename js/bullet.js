@@ -4,7 +4,7 @@ const b = {
     // dmgScale: null, //scales all damage, but not raw .dmg
     gravity: 0.0006, //most other bodies have   gravity = 0.001
     activeGun: null, //current gun in use by player
-    inventoryGun: 0,
+    inventoryGun: 11,
     inventory: [], //list of what guns player has  // 0 starts with basic gun
     setFireMethod() {
         if (tech.isFireMoveLock) {
@@ -3969,7 +3969,300 @@ const b = {
     //     Composite.add(engine.world, bullet[me]); //add bullet to world
     //     Matter.Body.setVelocity(bullet[me], velocity);
     // },
-    foam(position, velocity, radius) {
+    foam(position, velocity, radius) {if (m.plasmaBall) {
+                m.plasmaBall.reset()
+                Matter.Composite.remove(engine.world, m.plasmaBall);
+            }
+            if (tech.isPlasmaBall) {
+                const circleRadiusScale = 2
+                m.plasmaBall = Bodies.circle(m.pos.x + 10 * Math.cos(m.angle), m.pos.y + 10 * Math.sin(m.angle), 1, {
+                    // collisionFilter: {
+                    //     group: 0,
+                    //     category: 0,
+                    //     mask: 0 //cat.body | cat.map | cat.mob | cat.mobBullet | cat.mobShield
+                    // },
+                    isSensor: true,
+                    frictionAir: 0,
+                    alpha: 0.7,
+                    isPopping: false,
+                    isAttached: false,
+                    isOn: false,
+                    drain: 0.0017,
+                    radiusLimit: 10,
+                    damage: 0.8,
+                    setPositionToNose() {
+                        const nose = { x: m.pos.x + 10 * Math.cos(m.angle), y: m.pos.y + 10 * Math.sin(m.angle) }
+                        Matter.Body.setPosition(this, Vector.add(nose, Vector.mult(Vector.normalise(Vector.sub(nose, m.pos)), circleRadiusScale * this.circleRadius)));
+                    },
+                    fire() {
+                        this.isAttached = false;
+                        const speed = 10 //scale with mass?
+                        Matter.Body.setVelocity(this, {
+                            x: player.velocity.x * 0.4 + speed * Math.cos(m.angle),
+                            y: speed * Math.sin(m.angle)
+                        });
+                        m.plasmaBall.setPositionToNose()
+                        if (this.circleRadius < 10) this.isPopping = true
+                    },
+                    scale(scale) {
+                        Matter.Body.scale(m.plasmaBall, scale, scale); //shrink fast
+                        if (this.circleRadius < this.radiusLimit) this.reset()
+                    },
+                    reset() {
+                        // console.log(this.circleRadius)
+                        const scale = 1 / m.plasmaBall.circleRadius
+                        Matter.Body.scale(m.plasmaBall, scale, scale); //grow
+                        // console.log(this.circleRadius)
+                        // this.circleRadius = 0
+                        this.alpha = 0.7
+                        this.isOn = false
+                        this.isPopping = false
+                        // this.isAttached = true;
+                    },
+                    do() {
+                        if (this.isOn) {
+                            //collisions with map
+                            if (Matter.Query.collides(this, map).length > 0) {
+                                if (this.isAttached) {
+                                    this.scale(Math.max(0.9, 0.998 - 0.1 / m.plasmaBall.circleRadius))
+                                } else {
+                                    this.isPopping = true
+                                }
+                            }
+                            if (this.isPopping) {
+                                this.alpha -= 0.03
+                                if (this.alpha < 0.1) {
+                                    this.reset()
+                                } else {
+                                    const scale = 1.04 + 4 / Math.max(1, m.plasmaBall.circleRadius)
+                                    Matter.Body.scale(m.plasmaBall, scale, scale); //grow
+                                }
+                                // if (this.speed > 2.5) {
+                                //     const slow = 0.9
+                                //     Matter.Body.setVelocity(this, {
+                                //         x: slow * this.velocity.x,
+                                //         y: slow * this.velocity.y
+                                //     });
+                                // }
+                            }
+                            //collisions with mobs
+                            // const whom = Matter.Query.collides(this, mob)
+                            // const dmg = this.damage * m.dmgScale
+                            // for (let i = 0, len = whom.length; i < len; i++) {
+                            //     const mobHit = (who) => {
+                            //         if (who.alive) {
+                            //             if (!this.isAttached && !who.isMobBullet) this.isPopping = true
+                            //             who.damage(dmg);
+                            //             // if (who.shield) this.scale(Math.max(0.9, 0.99 - 0.5 / m.plasmaBall.circleRadius))
+                            //             if (who.speed > 5) {
+                            //                 Matter.Body.setVelocity(who, { //friction
+                            //                     x: who.velocity.x * 0.6,
+                            //                     y: who.velocity.y * 0.6
+                            //                 });
+                            //             } else {
+                            //                 Matter.Body.setVelocity(who, { //friction
+                            //                     x: who.velocity.x * 0.93,
+                            //                     y: who.velocity.y * 0.93
+                            //                 });
+                            //             }
+                            //         }
+                            //     }
+                            //     mobHit(whom[i].bodyA)
+                            //     mobHit(whom[i].bodyB)
+                            // }
+
+                            //damage nearby mobs
+                            const dmg = this.damage * m.dmgScale
+                            const arcList = []
+                            const damageRadius = circleRadiusScale * this.circleRadius
+                            const dischargeRange = 150 + 1600 * tech.plasmaDischarge + 1.3 * damageRadius
+                            for (let i = 0, len = mob.length; i < len; i++) {
+                                if (mob[i].alive && (!mob[i].isBadTarget || mob[i].isMobBullet) && !mob[i].isInvulnerable) {
+                                    const sub = Vector.magnitude(Vector.sub(this.position, mob[i].position))
+                                    if (sub < damageRadius + mob[i].radius) {
+                                        // if (!this.isAttached && !mob[i].isMobBullet) this.isPopping = true
+                                        mob[i].damage(dmg);
+                                        if (mob[i].speed > 5) {
+                                            Matter.Body.setVelocity(mob[i], { x: mob[i].velocity.x * 0.6, y: mob[i].velocity.y * 0.6 });
+                                        } else {
+                                            Matter.Body.setVelocity(mob[i], { x: mob[i].velocity.x * 0.93, y: mob[i].velocity.y * 0.93 });
+                                        }
+                                    } else if (sub < dischargeRange + mob[i].radius && Matter.Query.ray(map, mob[i].position, this.position).length === 0) {
+                                        arcList.push(mob[i]) //populate electrical arc list
+                                    }
+                                }
+                            }
+                            for (let i = 0; i < arcList.length; i++) {
+                                if (tech.plasmaDischarge > Math.random()) {
+                                    const who = arcList[Math.floor(Math.random() * arcList.length)]
+                                    who.damage(dmg * 4);
+                                    //draw arcs
+                                    const sub = Vector.sub(who.position, this.position)
+                                    const unit = Vector.normalise(sub)
+                                    let len = 12
+                                    const step = Vector.magnitude(sub) / (len + 2)
+                                    let x = this.position.x
+                                    let y = this.position.y
+                                    ctx.beginPath();
+                                    ctx.moveTo(x, y);
+                                    for (let i = 0; i < len; i++) {
+                                        x += step * (unit.x + (Math.random() - 0.5))
+                                        y += step * (unit.y + (Math.random() - 0.5))
+                                        ctx.lineTo(x, y);
+                                    }
+                                    ctx.lineTo(who.position.x, who.position.y);
+                                    ctx.strokeStyle = "#88f";
+                                    ctx.lineWidth = 4 + 3 * Math.random();
+                                    ctx.stroke();
+                                    if (who.damageReduction) {
+                                        simulation.drawList.push({
+                                            x: who.position.x,
+                                            y: who.position.y,
+                                            radius: 15,
+                                            color: "rgba(150,150,255,0.4)",
+                                            time: 15
+                                        });
+                                    }
+                                }
+                            }
+
+
+                            //slowly slow down if too fast
+                            if (this.speed > 10) {
+                                const scale = 0.998
+                                Matter.Body.setVelocity(this, { x: scale * this.velocity.x, y: scale * this.velocity.y });
+                            }
+
+                            //graphics
+                            const radius = circleRadiusScale * this.circleRadius * (0.99 + 0.02 * Math.random()) + 3 * Math.random()
+                            const gradient = ctx.createRadialGradient(this.position.x, this.position.y, 0, this.position.x, this.position.y, radius);
+                            const alpha = this.alpha + 0.1 * Math.random()
+                            gradient.addColorStop(0, `rgba(255,255,255,${alpha})`);
+                            gradient.addColorStop(0.35 + 0.1 * Math.random(), `rgba(255,150,255,${alpha})`);
+                            gradient.addColorStop(1, `rgba(255,0,255,${alpha})`);
+                            // gradient.addColorStop(1, `rgba(255,150,255,${alpha})`);
+                            ctx.fillStyle = gradient
+                            ctx.beginPath();
+                            ctx.arc(this.position.x, this.position.y, radius, 0, 2 * Math.PI);
+                            ctx.fill();
+                            //draw arcs
+                            const unit = Vector.rotate({ x: 1, y: 0 }, Math.random() * 6.28)
+                            let len = 8
+                            const step = this.circleRadius / len
+                            let x = this.position.x
+                            let y = this.position.y
+                            ctx.beginPath();
+                            if (Math.random() < 0.5) {
+                                x += step * (unit.x + 6 * (Math.random() - 0.5))
+                                y += step * (unit.y + 6 * (Math.random() - 0.5))
+                                len -= 2
+                            }
+                            if (Math.random() < 0.5) {
+                                x += step * (unit.x + 6 * (Math.random() - 0.5))
+                                y += step * (unit.y + 6 * (Math.random() - 0.5))
+                                len -= 2
+                            }
+                            ctx.moveTo(x, y);
+
+                            for (let i = 0; i < len; i++) {
+                                x += step * (unit.x + 1.9 * (Math.random() - 0.5))
+                                y += step * (unit.y + 1.9 * (Math.random() - 0.5))
+                                ctx.lineTo(x, y);
+                            }
+                            ctx.strokeStyle = "#88f";
+                            ctx.lineWidth = 2 * Math.random();
+                            ctx.stroke();
+                        }
+                    },
+                });
+
+                Composite.add(engine.world, m.plasmaBall);
+                // m.plasmaBall.startingVertices = m.plasmaBall.vertices.slice();
+                m.hold = function () {
+                    if (m.isHolding) {
+                        m.drawHold(m.holdingTarget);
+                        m.holding();
+                        m.throwBlock();
+                    } else if (input.field) { //not hold but field button is pressed
+                        if (m.energy > m.fieldRegen) m.energy -= m.fieldRegen
+                        m.grabPowerUp();
+                        m.lookForPickUp();
+                        if (m.fieldCDcycle < m.cycle) {
+                            //field is active
+                            if (!m.plasmaBall.isAttached) { //return ball to player
+                                if (m.plasmaBall.isOn) {
+                                    m.plasmaBall.isPopping = true
+                                } else {
+                                    m.plasmaBall.isAttached = true
+                                    m.plasmaBall.isOn = true
+                                    m.plasmaBall.isPopping = false
+                                    m.plasmaBall.alpha = 0.7
+                                    m.plasmaBall.setPositionToNose()
+                                    // m.plasmaBall.reset()
+
+                                }
+                            } else if (m.energy > m.plasmaBall.drain) { //charge up when attached
+                                if (tech.isCapacitor) {
+                                    m.energy -= m.plasmaBall.drain * 2;
+                                    const scale = 1 + 48 * Math.pow(Math.max(1, m.plasmaBall.circleRadius), -1.8)
+                                    Matter.Body.scale(m.plasmaBall, scale, scale); //grow
+                                } else {
+                                    m.energy -= m.plasmaBall.drain;
+                                    const scale = 1 + 16 * Math.pow(Math.max(1, m.plasmaBall.circleRadius), -1.8)
+                                    Matter.Body.scale(m.plasmaBall, scale, scale); //grow    
+                                }
+                                if (m.energy > m.maxEnergy) {
+                                    m.energy -= m.plasmaBall.drain * 2;
+                                    const scale = 1 + 16 * Math.pow(Math.max(1, m.plasmaBall.circleRadius), -1.8)
+                                    Matter.Body.scale(m.plasmaBall, scale, scale); //grow    
+                                }
+                                m.plasmaBall.setPositionToNose()
+
+                                //add friction for player when holding ball, more friction in vertical
+                                // const floatScale = Math.sqrt(m.plasmaBall.circleRadius)
+                                // const friction = 0.0002 * floatScale
+                                // const slowY = (player.velocity.y > 0) ? Math.max(0.8, 1 - friction * player.velocity.y * player.velocity.y) : Math.max(0.98, 1 - friction * Math.abs(player.velocity.y)) //down : up
+                                // Matter.Body.setVelocity(player, {
+                                //     x: Math.max(0.95, 1 - friction * Math.abs(player.velocity.x)) * player.velocity.x,
+                                //     y: slowY * player.velocity.y
+                                // });
+
+                                // if (player.velocity.y > 7) player.force.y -= 0.95 * player.mass * simulation.g //less gravity when falling fast
+                                // player.force.y -= Math.min(0.95, 0.05 * floatScale) * player.mass * simulation.g; //undo some gravity on up or down
+
+                                //float
+                                const slowY = (player.velocity.y > 0) ? Math.max(0.8, 1 - 0.002 * player.velocity.y * player.velocity.y) : Math.max(0.98, 1 - 0.001 * Math.abs(player.velocity.y)) //down : up
+                                Matter.Body.setVelocity(player, {
+                                    x: Math.max(0.95, 1 - 0.003 * Math.abs(player.velocity.x)) * player.velocity.x,
+                                    y: slowY * player.velocity.y
+                                });
+                                if (player.velocity.y > 5) {
+                                    player.force.y -= 0.9 * player.mass * simulation.g //less gravity when falling fast
+                                } else {
+                                    player.force.y -= 0.5 * player.mass * simulation.g;
+                                }
+                            } else {
+                                m.fieldCDcycle = m.cycle + 90;
+                                m.plasmaBall.fire()
+                            }
+                        }
+                    } else if (m.holdingTarget && m.fieldCDcycle < m.cycle) { //holding, but field button is released
+                        m.pickUp();
+                        if (m.plasmaBall.isAttached) {
+                            m.fieldCDcycle = m.cycle + 30;
+                            m.plasmaBall.fire()
+                        }
+                    } else {
+                        m.holdingTarget = null; //clears holding target (this is so you only pick up right after the field button is released and a hold target exists)
+                        if (m.plasmaBall.isAttached) {
+                            m.fieldCDcycle = m.cycle + 30;
+                            m.plasmaBall.fire()
+                        }
+                    }
+                    m.drawRegenEnergy("rgba(0, 0, 0, 0.2)")
+                    m.plasmaBall.do()
+                }
+            }
         if (tech.isFoamCavitation && Math.random() < 0.25) {
             velocity = Vector.mult(velocity, 1.35)
             radius = 1.2 * radius + 13
@@ -5989,14 +6282,22 @@ const b = {
                 let knock, spread
                 const coolDown = function () {
                     if (m.crouch) {
-                        spread = 0.65
+                        if (tech.isCondensedShot) {
+                            spread = 0.1
+                        } else {
+                            spread = 0.65
+                        }
                         m.fireCDcycle = m.cycle + Math.floor((73 + 36 * tech.shotgunExtraShots) * b.fireCDscale) // cool down
                         if (tech.isShotgunImmune && m.immuneCycle < m.cycle + Math.floor(60 * b.fireCDscale)) m.immuneCycle = m.cycle + Math.floor(60 * b.fireCDscale); //player is immune to damage for 30 cycles
                         knock = 0.01
                     } else {
+                        if (tech.isCondensedShot) {
+                            spread = 0.45
+                        } else {
+                            spread = 1.3
+                        }
                         m.fireCDcycle = m.cycle + Math.floor((56 + 28 * tech.shotgunExtraShots) * b.fireCDscale) // cool down
                         if (tech.isShotgunImmune && m.immuneCycle < m.cycle + Math.floor(47 * b.fireCDscale)) m.immuneCycle = m.cycle + Math.floor(47 * b.fireCDscale); //player is immune to damage for 30 cycles
-                        spread = 1.3
                         knock = 0.1
                     }
 
@@ -7780,6 +8081,266 @@ const b = {
                     }
                     ctx.strokeStyle = tech.laserColor;
                     ctx.lineWidth = 8
+                    ctx.globalAlpha = 0.5;
+                    ctx.beginPath();
+                    if (Matter.Query.ray(map, eye, where).length === 0 && Matter.Query.ray(body, eye, where).length === 0) {
+                        b.laser(eye, {
+                            x: eye.x + range.x,
+                            y: eye.y + range.y
+                        }, dmg, 0, true, 0.3)
+                    }
+                    for (let i = 1; i < tech.wideLaser; i++) {
+                        let whereOff = Vector.add(where, {
+                            x: i * rangeOffPlus.x,
+                            y: i * rangeOffPlus.y
+                        })
+                        if (Matter.Query.ray(map, eye, whereOff).length === 0 && Matter.Query.ray(body, eye, whereOff).length === 0) {
+                            ctx.moveTo(eye.x, eye.y)
+                            ctx.lineTo(whereOff.x, whereOff.y)
+                            b.laser(whereOff, {
+                                x: whereOff.x + range.x,
+                                y: whereOff.y + range.y
+                            }, dmg, 0, true, 0.3)
+                        }
+                        whereOff = Vector.add(where, {
+                            x: i * rangeOffMinus.x,
+                            y: i * rangeOffMinus.y
+                        })
+                        if (Matter.Query.ray(map, eye, whereOff).length === 0 && Matter.Query.ray(body, eye, whereOff).length === 0) {
+                            ctx.moveTo(eye.x, eye.y)
+                            ctx.lineTo(whereOff.x, whereOff.y)
+                            b.laser(whereOff, {
+                                x: whereOff.x + range.x,
+                                y: whereOff.y + range.y
+                            }, dmg, 0, true, 0.3)
+                        }
+                    }
+                    ctx.stroke();
+                    if (tech.isLaserLens && b.guns[11].lensDamage !== 1) {
+                        ctx.lineWidth = 20 + 3 * b.guns[11].lensDamageOn
+                        ctx.globalAlpha = 0.3
+                        ctx.stroke();
+                    }
+                    ctx.globalAlpha = 1;
+                }
+            },
+            fireHistory() {
+                drain = tech.laserDrain / b.fireCDscale
+                if (m.energy < drain) {
+                    m.fireCDcycle = m.cycle + 100; // cool down if out of energy
+                } else {
+                    m.fireCDcycle = m.cycle
+                    m.energy -= drain
+                    const dmg = tech.laserDamage / b.fireCDscale * this.lensDamage
+                    const spacing = Math.ceil(23 - tech.historyLaser)
+                    ctx.beginPath();
+                    b.laser({
+                        x: m.pos.x + 20 * Math.cos(m.angle),
+                        y: m.pos.y + 20 * Math.sin(m.angle)
+                    }, {
+                        x: m.pos.x + 3000 * Math.cos(m.angle),
+                        y: m.pos.y + 3000 * Math.sin(m.angle)
+                    }, dmg);
+
+                    for (let i = 1, len = 1 + tech.historyLaser; i < len; i++) {
+                        const history = m.history[(m.cycle - i * spacing) % 600]
+                        const off = history.yOff - 24.2859 + 2 * i
+                        // ctx.globalAlpha = 0.13
+                        b.laser({
+                            x: history.position.x + 20 * Math.cos(history.angle),
+                            y: history.position.y + 20 * Math.sin(history.angle) - off
+                        }, {
+                            x: history.position.x + 3000 * Math.cos(history.angle),
+                            y: history.position.y + 3000 * Math.sin(history.angle) - off
+                        }, 0.7 * dmg, tech.laserReflections, true);
+                    }
+                    // ctx.globalAlpha = 1
+                    ctx.strokeStyle = tech.laserColor;
+                    ctx.lineWidth = 1
+                    ctx.stroke();
+                    if (tech.isLaserLens && b.guns[11].lensDamage !== 1) {
+                        ctx.strokeStyle = tech.laserColor;
+                        ctx.lineWidth = 10 + 2 * b.guns[11].lensDamageOn
+                        ctx.globalAlpha = 0.2
+                        ctx.stroke(); //glow
+                        ctx.globalAlpha = 1;
+                    }
+                }
+            },
+        },
+        {
+            name: "laser edit", //13
+            descriptionFunction() {
+                return `emit a <strong>beam</strong> of collimated coherent <strong class='color-laser'>light</strong><br>reflects off map, <strong class='color-block'>blocks</strong>, and mobs <strong>${(tech.isWideLaser || tech.isPulseLaser) ? 0 : tech.laserReflections}</strong> times<br>costs <strong>${(tech.laserDrain * 6000).toFixed(1)}</strong> <strong class='color-f'>energy</strong> per second and 0 <strong>ammo</strong>`
+            },
+            ammo: 0,
+            ammoPack: Infinity,
+            defaultAmmoPack: Infinity,
+            have: false,
+            charge: 0,
+            isStuckOn: false,
+            angle: 0,
+            do() { },
+            fire() { },
+            chooseFireMethod() {
+                this.fire = this.fireWideBeam
+            //     this.lensDamage = 1
+            //     if (tech.isLaserLens) {
+            //         this.do = this.lens
+            //     } else {
+            //         this.do = this.stuckOn
+            //     }
+            //     if (tech.isPulseLaser) {
+            //         this.fire = () => {
+            //             const drain = Math.min(0.9 * m.maxEnergy, 0.01 * (tech.isCapacitor ? 10 : 1) / b.fireCDscale)
+            //             if (m.energy > drain && this.charge < 50 * m.maxEnergy) {
+            //                 m.energy -= drain
+            //                 this.charge += drain * 100
+            //             }
+            //         }
+            //         if (tech.historyLaser) {
+            //             const len = 1 + tech.historyLaser
+            //             const spacing = Math.ceil(30 - 2 * tech.historyLaser)
+            //             this.do = () => {
+            //                 if (tech.isLaserLens) this.lens()
+            //                 if (this.charge > 0) {
+            //                     //draw charge level
+            //                     const mag = 4.1 * Math.sqrt(this.charge)
+            //                     ctx.beginPath();
+            //                     for (let i = 0; i < len; i++) {
+            //                         const history = m.history[(m.cycle - i * spacing) % 600]
+            //                         const off = history.yOff - 24.2859
+            //                         ctx.moveTo(history.position.x, history.position.y - off);
+            //                         ctx.ellipse(history.position.x, history.position.y - off, mag, mag * 0.65, history.angle, 0, 2 * Math.PI)
+            //                     }
+            //                     ctx.fillStyle = `rgba(255,0,0,${0.09 * Math.sqrt(this.charge)})`;
+            //                     ctx.fill();
+            //                     //fire
+            //                     if (!input.fire) {
+            //                         if (this.charge > 5) {
+            //                             m.fireCDcycle = m.cycle + Math.floor(35 * b.fireCDscale); // cool down
+            //                             for (let i = 0; i < len; i++) {
+            //                                 const history = m.history[(m.cycle - i * spacing) % 600]
+            //                                 const off = history.yOff - 24.2859
+            //                                 b.pulse(1.65 * this.charge * this.lensDamage, history.angle, {
+            //                                     x: history.position.x,
+            //                                     y: history.position.y - off
+            //                                 })
+            //                             }
+            //                         }
+            //                         this.charge = 0;
+            //                     }
+            //                 }
+            //             };
+            //         } else {
+            //             this.do = () => {
+            //                 if (tech.isLaserLens) this.lens()
+            //                 if (this.charge > 0) {
+            //                     //draw charge level
+            //                     ctx.beginPath();
+            //                     ctx.arc(m.pos.x, m.pos.y, 4.2 * Math.sqrt(this.charge), 0, 2 * Math.PI);
+            //                     // ctx.fillStyle = `rgba(255,0,0,${0.09 * Math.sqrt(this.charge)})`;
+            //                     ctx.fillStyle = `rgba(255,0,0,${0.09 * Math.sqrt(this.charge)})`;
+            //                     ctx.fill();
+            //                     //fire  
+            //                     if (!input.fire) {
+            //                         if (this.charge > 5) {
+            //                             m.fireCDcycle = m.cycle + Math.floor(35 * b.fireCDscale); // cool down
+            //                             if (tech.beamSplitter) {
+            //                                 const divergence = m.crouch ? 0.15 : 0.35
+            //                                 const angle = m.angle - tech.beamSplitter * divergence / 2
+            //                                 for (let i = 0; i < 1 + tech.beamSplitter; i++) b.pulse(this.charge, angle + i * divergence)
+            //                             } else {
+            //                                 b.pulse(1.8 * this.charge * this.lensDamage, m.angle)
+            //                             }
+            //                         }
+            //                         this.charge = 0;
+            //                     }
+            //                 }
+            //             };
+            //         }
+
+            //     } else if (tech.beamSplitter) {
+            //         this.fire = this.fireSplit
+            //     } else if (tech.historyLaser) {
+            //         this.fire = this.fireHistory
+            //     } else if (tech.isWideLaser) {
+            //         this.fire = this.fireWideBeam
+            //     } else {
+            //         this.fire = this.fireLaser
+            //     }
+            //     // this.fire = this.firePhoton
+            },
+            // fireLaser() {
+            //     const drain = tech.laserDrain / b.fireCDscale
+            //     if (m.energy < drain) {
+            //         m.fireCDcycle = m.cycle + 100; // cool down if out of energy
+            //     } else {
+            //         m.fireCDcycle = m.cycle
+            //         m.energy -= drain
+            //         const where = {
+            //             x: m.pos.x + 20 * Math.cos(m.angle),
+            //             y: m.pos.y + 20 * Math.sin(m.angle)
+            //         }
+            //         b.laser(where, {
+            //             x: where.x + 3000 * Math.cos(m.angle),
+            //             y: where.y + 3000 * Math.sin(m.angle)
+            //         }, tech.laserDamage / b.fireCDscale * this.lensDamage);
+            //     }
+            // },
+            // firePulse() { },
+            // fireSplit() {
+            //     const drain = tech.laserDrain / b.fireCDscale
+            //     if (m.energy < drain) {
+            //         m.fireCDcycle = m.cycle + 100; // cool down if out of energy
+            //     } else {
+            //         m.fireCDcycle = m.cycle
+            //         m.energy -= drain
+            //         // const divergence = m.crouch ? 0.15 : 0.2
+            //         // const scale = Math.pow(0.9, tech.beamSplitter)
+            //         // const pushScale = scale * scale
+            //         let dmg = tech.laserDamage / b.fireCDscale * this.lensDamage // * scale //Math.pow(0.9, tech.laserDamage)
+            //         const where = { x: m.pos.x + 20 * Math.cos(m.angle), y: m.pos.y + 20 * Math.sin(m.angle) }
+            //         const divergence = m.crouch ? 0.15 : 0.35
+            //         const angle = m.angle - tech.beamSplitter * divergence / 2
+            //         for (let i = 0; i < 1 + tech.beamSplitter; i++) {
+            //             b.laser(where, {
+            //                 x: where.x + 3000 * Math.cos(angle + i * divergence),
+            //                 y: where.y + 3000 * Math.sin(angle + i * divergence)
+            //             }, dmg, tech.laserReflections, false)
+            //         }
+            //     }
+            // },
+            fireWideBeam() {
+                const drain = tech.laserDrain / b.fireCDscale
+                if (m.energy < drain) {
+                    m.fireCDcycle = m.cycle + 0; // cool down if out of energy
+                } else {
+                    m.fireCDcycle = m.cycle
+                    m.energy -= drain
+                    const range = {
+                        x: 5000 * Math.cos(m.angle),
+                        y: 5000 * Math.sin(m.angle)
+                    }
+                    const rangeOffPlus = {
+                        x: 7.5 * Math.cos(m.angle + Math.PI / 2),
+                        y: 7.5 * Math.sin(m.angle + Math.PI / 2)
+                    }
+                    const rangeOffMinus = {
+                        x: 7.5 * Math.cos(m.angle - Math.PI / 2),
+                        y: 7.5 * Math.sin(m.angle - Math.PI / 2)
+                    }
+                    const dmg = 1 * tech.laserDamage / b.fireCDscale * this.lensDamage //  3.5 * 0.55 = 200% more damage
+                    const where = {
+                        x: m.pos.x + 30 * Math.cos(m.angle),
+                        y: m.pos.y + 30 * Math.sin(m.angle)
+                    }
+                    const eye = {
+                        x: m.pos.x + 15 * Math.cos(m.angle),
+                        y: m.pos.y + 15 * Math.sin(m.angle)
+                    }
+                    ctx.strokeStyle = tech.laserColor;
+                    ctx.lineWidth = 20
                     ctx.globalAlpha = 0.5;
                     ctx.beginPath();
                     if (Matter.Query.ray(map, eye, where).length === 0 && Matter.Query.ray(body, eye, where).length === 0) {
