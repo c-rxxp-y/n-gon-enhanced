@@ -4772,6 +4772,25 @@ const tech = {
     //************************************************** tech
     //**************************************************
     {
+        name: "condensed shot",
+        description: "<strong>shotgun spread</strong> is reduced",
+        isGunTech: true,
+        maxCount: 1,
+        count: 0,
+        frequency: 2,
+        frequencyDefualt: 2,
+        allowed() {
+            return (tech.haveGunCheck("shotgun"))
+        },
+        requires: "shotgun",
+        effect() {
+            tech.isCondensedShot = true;
+        },
+        remove() {
+            tech.isCondensedShot = false;
+        }
+    },
+    {
         name: "needle ice",
         description: `after <strong>needles</strong> impact walls<br>they chip off <strong>1-2</strong> freezing <strong class='color-s'>ice IX</strong> crystals`,
         isGunTech: true,
@@ -7393,9 +7412,9 @@ const tech = {
         frequency: 2,
         frequencyDefault: 2,
         allowed() {
-            return (tech.haveGunCheck("laser") && !tech.isPulseLaser) || tech.isLaserBotUpgrade || tech.isLaserField
+            return (tech.haveGunCheck("laser") || tech.haveGunCheck("laser edit") && !tech.isPulseLaser) || tech.isLaserBotUpgrade || tech.isLaserField
         },
-        requires: "laser, not pulse",
+        requires: "laser, laser edit gun, not pulse",
         effect() {
             tech.isLaserPush = true;
         },
@@ -7520,19 +7539,21 @@ const tech = {
         frequency: 2,
         frequencyDefault: 2,
         allowed() {
-            return tech.haveGunCheck("laser") && tech.laserReflections < 3 && !tech.beamSplitter && !tech.isPulseLaser && !tech.historyLaser
+            return tech.haveGunCheck("laser") || tech.haveGunCheck("laser edit") && tech.laserReflections < 3 && !tech.beamSplitter && !tech.isPulseLaser && !tech.historyLaser
         },
-        requires: "laser gun, not specular reflection, diffraction grating, slow light, pulse",
+        requires: "laser gun, laser edit gun, not specular reflection, diffraction grating, slow light, pulse",
         effect() {
             if (tech.wideLaser === 0) tech.wideLaser = 3
             tech.isWideLaser = true;
             b.guns[11].chooseFireMethod()
+            b.guns[13].chooseFireMethod()
         },
         remove() {
             if (tech.isWideLaser) {
                 // tech.wideLaser = 0
                 tech.isWideLaser = false;
                 b.guns[11].chooseFireMethod()
+                b.guns[13].chooseFireMethod()
             }
         }
     },
@@ -7848,7 +7869,7 @@ const tech = {
         frequency: 2,
         frequencyDefault: 2,
         allowed() {
-            return m.fieldMode === 2 || m.fieldMode === 1 || m.fieldMode === 4
+            return m.fieldMode === 2 || m.fieldMode === 1 || m.fieldMode === 4 || m.fieldMode === 11
         },
         requires: "a field that can block",
         effect() {
@@ -7881,14 +7902,14 @@ const tech = {
         name: "Meissner effect",
         description: "<strong>1.55x</strong> perfect diamagnetism <strong>radius</strong><br><strong>+22°</strong> perfect diamagnetism circular <strong>arc</strong>",
         isFieldTech: true,
-        maxCount: 1,
+        maxCount: 9,
         count: 0,
         frequency: 2,
         frequencyDefault: 2,
         allowed() {
-            return m.fieldMode === 2
+            return m.fieldMode === 2 || m.fieldMode === 11
         },
-        requires: "perfect diamagnetism",
+        requires: "perfect diamagnetism, einstein's shield",
         effect() {
             tech.isBigField = true;
         },
@@ -11878,7 +11899,7 @@ const tech = {
     }
     ],
     //variables use for gun tech upgrades
-    fireRate: 1, //initializes to 1
+    fireRate: 10, //initializes to 1
     bulletSize: null,
     energySiphon: null,
     healSpawn: null,
@@ -12235,4 +12256,5 @@ const tech = {
     isWiki: null,
     isStaticBlock: null,
     isDamageFieldTech: null,
+    isCondensedShot: null,
 }
