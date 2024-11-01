@@ -2643,7 +2643,7 @@ const m = {
         } else if (m.fieldMode === 10) {
             m.fieldRegen = 0.0015 //9 energy per second grappling hook
         } else if (m.fieldMode === 11) {
-            m.fieldRegen = 0.00067 //4 energy per second eintein's sheild
+            m.fieldRegen = 0.00067 //4 energy per second eintein's shield
         } else {
             m.fieldRegen = 0.001 //6 energy per second
         }
@@ -5751,7 +5751,7 @@ const m = {
         }
     },
     {
-        name: "einstein's sheild",
+        name: "einstein's shield",
         description: `<strong>shield</strong> maintains <strong>functionality</strong> while inactive<br><strong>4</strong> <strong class='color-f'>energy</strong> per second`,
         effect: () => {
             m.fieldMeterColor = "#48f" //"#0c5"
