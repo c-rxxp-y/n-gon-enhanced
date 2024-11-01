@@ -2642,6 +2642,8 @@ const m = {
             m.fieldRegen = 0.00117 //7 energy per second wormhole
         } else if (m.fieldMode === 10) {
             m.fieldRegen = 0.0015 //9 energy per second grappling hook
+        } else if (m.fieldMode === 11) {
+            m.fieldRegen = 0.00067 //4 energy per second eintein's sheild
         } else {
             m.fieldRegen = 0.001 //6 energy per second
         }
@@ -5745,6 +5747,242 @@ const m = {
                 }
                 m.drawRegenEnergy()
                 //look for nearby mobs and fire harpoons at them
+            }
+        }
+    },
+    {
+        name: "einstein's sheild",
+        description: `<strong>shield</strong> maintains <strong>functionality</strong> while inactive<br><strong>4</strong> <strong class='color-f'>energy</strong> per second`,
+        effect: () => {
+            m.fieldMeterColor = "#48f" //"#0c5"
+            m.eyeFillColor = m.fieldMeterColor
+            m.fieldShieldingScale = 0;
+            m.fieldBlockCD = 3;
+            m.grabPowerUpRange2 = 10000000
+            m.fieldPosition = { x: simulation.mouse.x, y: simulation.mouse.y }
+            m.fieldAngle = m.angle
+            m.perfectPush = (isFree = false) => {
+                if (m.fieldCDcycle < m.cycle) {
+                    for (let i = 0, len = mob.length; i < len; ++i) {
+                        if (
+                            Vector.magnitude(Vector.sub(mob[i].position, m.fieldPosition)) - mob[i].radius < m.fieldRange &&
+                            !mob[i].isUnblockable &&
+                            Vector.dot({ x: Math.cos(m.fieldAngle), y: Math.sin(m.fieldAngle) }, Vector.normalise(Vector.sub(mob[i].position, m.fieldPosition))) > m.fieldThreshold &&
+                            Matter.Query.ray(map, mob[i].position, m.fieldPosition).length === 0
+                        ) {
+                            mob[i].locatePlayer();
+                            const unit = Vector.normalise(Vector.sub(m.fieldPosition, mob[i].position))
+                            m.fieldCDcycle = m.cycle + m.fieldBlockCD + (mob[i].isShielded ? 10 : 0);
+                            if (!mob[i].isInvulnerable && bullet.length < 250) {
+                                for (let i = 0; i < m.coupling; i++) {
+                                    if (0.1 * m.coupling - i > Math.random()) {
+                                        const angle = m.fieldAngle + 4 * m.fieldArc * (Math.random() - 0.5)
+                                        const radius = m.fieldRange * (0.6 + 0.3 * Math.random())
+                                        b.iceIX(6 + 6 * Math.random(), angle, Vector.add(m.fieldPosition, {
+                                            x: radius * Math.cos(angle),
+                                            y: radius * Math.sin(angle)
+                                        }))
+                                    }
+                                }
+                            }
+                            if (tech.blockDmg) { //electricity
+                                Matter.Body.setVelocity(mob[i], { x: 0.5 * mob[i].velocity.x, y: 0.5 * mob[i].velocity.y });
+                                if (mob[i].isShielded) {
+                                    for (let j = 0, len = mob.length; j < len; j++) {
+                                        if (mob[j].id === mob[i].shieldID) mob[j].damage(tech.blockDmg * m.dmgScale * (tech.isBlockRadiation ? 6 : 2), true)
+                                    }
+                                } else if (tech.isBlockRadiation) {
+                                    if (mob[i].isMobBullet) {
+                                        mob[i].damage(tech.blockDmg * m.dmgScale * 3, true)
+                                    } else {
+                                        mobs.statusDoT(mob[i], tech.blockDmg * m.dmgScale * 0.42, 180) //200% increase -> x (1+2) //over 7s -> 360/30 = 12 half seconds -> 3/12
+                                    }
+                                } else {
+                                    mob[i].damage(tech.blockDmg * m.dmgScale, true)
+                                }
+                                // if (mob[i].isShielded) {
+                                //     for (let j = 0, len = mob.length; j < len; j++) {
+                                //         if (mob[j].id === mob[i].shieldID) mob[j].damage(tech.blockDmg * m.dmgScale * (tech.isBlockRadiation ? 3 : 1), true)
+                                //     }
+                                // } else {
+                                //     if (tech.isBlockRadiation && !mob[i].isMobBullet) {
+                                //         mobs.statusDoT(mob[i], tech.blockDmg * m.dmgScale * 4 / 12, 360) //200% increase -> x (1+2) //over 7s -> 360/30 = 12 half seconds -> 3/12
+                                //     } else {
+                                //         mob[i].damage(tech.blockDmg * m.dmgScale)
+                                //     }
+                                // }
+                                const step = 40
+                                ctx.beginPath();
+                                for (let i = 0, len = 0.5 * tech.blockDmg; i < len; i++) {
+                                    let x = m.fieldPosition.x - 20 * unit.x;
+                                    let y = m.fieldPosition.y - 20 * unit.y;
+                                    ctx.moveTo(x, y);
+                                    for (let i = 0; i < 8; i++) {
+                                        x += step * (-unit.x + 1.5 * (Math.random() - 0.5))
+                                        y += step * (-unit.y + 1.5 * (Math.random() - 0.5))
+                                        ctx.lineTo(x, y);
+                                    }
+                                }
+                                ctx.lineWidth = 3;
+                                ctx.strokeStyle = "#f0f";
+                                ctx.stroke();
+                            } else if (isFree) {
+                                ctx.lineWidth = 20; //when blocking draw this graphic
+                                ctx.fillStyle = `rgba(110,150,220, ${0.2 + 0.4 * Math.random()})`
+                                ctx.strokeStyle = "#000";
+                                const len = mob[i].vertices.length - 1;
+                                const mag = mob[i].radius
+                                ctx.beginPath();
+                                ctx.moveTo(mob[i].vertices[len].x + mag * (Math.random() - 0.5), mob[i].vertices[len].y + mag * (Math.random() - 0.5))
+                                for (let j = 0; j < len; j++) {
+                                    ctx.lineTo(mob[i].vertices[j].x + mag * (Math.random() - 0.5), mob[i].vertices[j].y + mag * (Math.random() - 0.5));
+                                }
+                                ctx.lineTo(mob[i].vertices[len].x + mag * (Math.random() - 0.5), mob[i].vertices[len].y + mag * (Math.random() - 0.5))
+                                ctx.fill();
+                                ctx.stroke();
+                            } else {
+
+                                const eye = 15; //when blocking draw this graphic
+                                const len = mob[i].vertices.length - 1;
+                                ctx.lineWidth = 1;
+                                ctx.fillStyle = `rgba(110,150,220, ${0.2 + 0.4 * Math.random()})`
+                                ctx.strokeStyle = "#000";
+                                ctx.beginPath();
+                                ctx.moveTo(m.fieldPosition.x + eye * Math.cos(m.fieldAngle), m.fieldPosition.y + eye * Math.sin(m.fieldAngle));
+                                ctx.lineTo(mob[i].vertices[len].x, mob[i].vertices[len].y);
+                                ctx.lineTo(mob[i].vertices[0].x, mob[i].vertices[0].y);
+                                ctx.fill();
+                                ctx.stroke();
+                                for (let j = 0; j < len; j++) {
+                                    ctx.beginPath();
+                                    ctx.moveTo(m.fieldPosition.x + eye * Math.cos(m.fieldAngle), m.fieldPosition.y + eye * Math.sin(m.fieldAngle));
+                                    ctx.lineTo(mob[i].vertices[j].x, mob[i].vertices[j].y);
+                                    ctx.lineTo(mob[i].vertices[j + 1].x, mob[i].vertices[j + 1].y);
+                                    ctx.fill();
+                                    ctx.stroke();
+                                }
+                            }
+                            m.bulletsToBlocks(mob[i])
+                            if (tech.isStunField) mobs.statusStun(mob[i], tech.isStunField)
+                            //mob knock backs
+                            const massRoot = Math.sqrt(Math.max(1, mob[i].mass));
+                            Matter.Body.setVelocity(mob[i], {
+                                x: player.velocity.x - (30 * unit.x) / massRoot,
+                                y: player.velocity.y - (30 * unit.y) / massRoot
+                            });
+                            if (mob[i].isUnstable) {
+                                if (m.fieldCDcycle < m.cycle + 10) m.fieldCDcycle = m.cycle + 6
+                                mob[i].death();
+                            }
+                            if (!isFree) { //player knock backs
+                                if (mob[i].isDropPowerUp && player.speed < 12) {
+                                    const massRootCap = Math.sqrt(Math.min(10, Math.max(0.2, mob[i].mass)));
+                                    Matter.Body.setVelocity(player, {
+                                        x: 0.9 * player.velocity.x + 0.6 * unit.x * massRootCap,
+                                        y: 0.9 * player.velocity.y + 0.6 * unit.y * massRootCap
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            m.hold = function () {
+                const wave = Math.sin(m.cycle * 0.022);
+                m.fieldRange = 360 + 12 + 10 * tech.isBigField
+                m.fieldArc = 1 + 0.1 + 0.1 * tech.isBigField //run calculateFieldThreshold after setting fieldArc, used for powerUp grab and mobPush with lookingAt(mob)
+                m.calculateFieldThreshold();
+                if (m.isHolding) {
+                    m.drawHold(m.holdingTarget);
+                    m.holding();
+                    m.throwBlock();
+                } else if (input.field) { //not hold but field button is pressed
+                    //float while field is on
+                    const angleReduction = 0.5 + 0.7 * (Math.PI / 2 - Math.min(Math.PI / 2, Math.abs(m.angle + Math.PI / 2)))
+                    // console.log(angleReduction)
+                    if (player.velocity.y > 1) {
+                        player.force.y -= angleReduction * (tech.isBigField ? 0.95 : 0.5) * player.mass * simulation.g;
+                        Matter.Body.setVelocity(player, {
+                            x: player.velocity.x,
+                            y: 0.98 * player.velocity.y
+                        }); //set velocity to cap, but keep the direction
+                    }
+
+                    // go invulnerable while field is active, but also drain energy
+                    // if (true && m.energy > 2 * m.fieldRegen && m.immuneCycle < m.cycle + tech.cyclicImmunity) {
+                    //     m.immuneCycle = m.cycle + 1; //player is immune to damage for 60 cycles
+                    //     m.energy -= 2 * m.fieldRegen
+                    //     if (m.energy < m.fieldRegen) m.fieldCDcycle = m.cycle + 90;
+                    // }
+
+                    if (m.energy > m.fieldRegen) m.energy -= m.fieldRegen
+                    m.grabPowerUp();
+                    m.lookForPickUp();
+                    m.fieldPosition = { x: m.pos.x, y: m.pos.y }
+                    m.fieldAngle = m.angle
+                    //draw field attached to player
+                    if (m.holdingTarget) {
+                        ctx.fillStyle = `rgba(210,150,220, ${0.1 + 0.03 * Math.random()})`
+                        ctx.strokeStyle = `rgba(210,110,10, ${0.15 + 0.05 * Math.random()})`
+                    } else {
+                        ctx.fillStyle = `rgba(210,150,220, ${0.1 + 0.2 * Math.random() - 0.1 * wave})`
+                        ctx.strokeStyle = `rgba(210,110,10, ${0.15 + 0.5 * Math.random()})`
+                    }
+                    ctx.beginPath();
+                    ctx.arc(m.pos.x, m.pos.y, m.fieldRange, m.angle - Math.PI * m.fieldArc, m.angle + Math.PI * m.fieldArc, false);
+                    ctx.lineWidth = 10 - 1.5 * wave;
+                    ctx.stroke();
+                    const curve = 1 + 0.04 * wave
+                    const aMag = (1 - curve * 1.2) * Math.PI * m.fieldArc
+                    let a = m.angle + aMag
+                    let cp1x = m.pos.x + curve * m.fieldRange * Math.cos(a)
+                    let cp1y = m.pos.y + curve * m.fieldRange * Math.sin(a)
+                    ctx.quadraticCurveTo(cp1x, cp1y, m.pos.x + 30 * Math.cos(m.angle), m.pos.y + 30 * Math.sin(m.angle))
+                    a = m.angle - aMag
+                    cp1x = m.pos.x + curve * m.fieldRange * Math.cos(a)
+                    cp1y = m.pos.y + curve * m.fieldRange * Math.sin(a)
+                    ctx.quadraticCurveTo(cp1x, cp1y, m.pos.x + 1 * m.fieldRange * Math.cos(m.angle - Math.PI * m.fieldArc), m.pos.y + 1 * m.fieldRange * Math.sin(m.angle - Math.PI * m.fieldArc))
+                    ctx.fill();
+                    m.perfectPush();
+                } else if (m.holdingTarget && m.fieldCDcycle < m.cycle) { //holding, but field button is released
+                    m.pickUp();
+                } else {
+                    m.holdingTarget = null; //clears holding target (this is so you only pick up right after the field button is released and a hold target exists)
+                    if (!input.field) { //&& tech.isFieldFree
+                        //draw field free of player
+                        ctx.fillStyle = `rgba(210,150,220, ${0.1 + 0.2 * Math.random() - 0.1 * wave})`
+                        ctx.strokeStyle = `rgba(210,110,10, ${0.15 + 0.5 * Math.random()})`
+                        ctx.beginPath();
+                        ctx.arc(m.fieldPosition.x, m.fieldPosition.y, m.fieldRange, m.fieldAngle - Math.PI * m.fieldArc, m.fieldAngle + Math.PI * m.fieldArc, false);
+                        ctx.lineWidth = 10 - 1.5 * wave;
+                        ctx.stroke();
+                        const curve = 0.8 + 0.06 * wave;
+                        const aMag = (1 - curve * 1.2) * Math.PI * m.fieldArc
+                        let a = m.fieldAngle + aMag
+                        ctx.quadraticCurveTo(m.fieldPosition.x + curve * m.fieldRange * Math.cos(a), m.fieldPosition.y + curve * m.fieldRange * Math.sin(a), m.fieldPosition.x + 1 * m.fieldRange * Math.cos(m.fieldAngle - Math.PI * m.fieldArc), m.fieldPosition.y + 1 * m.fieldRange * Math.sin(m.fieldAngle - Math.PI * m.fieldArc))
+                        ctx.fill();
+                        m.perfectPush(true);
+
+                    }
+                }
+                // m.drawRegenEnergy()
+                m.drawRegenEnergy("rgba(100,200,0,0.2)")
+                if (tech.isPerfectBrake) { //cap mob speed around player
+                    const range = 200 + 140 * wave + 150 * m.energy
+                    for (let i = 0; i < mob.length; i++) {
+                        const distance = Vector.magnitude(Vector.sub(m.pos, mob[i].position))
+                        if (distance < range) {
+                            const cap = mob[i].isShielded ? 8 : 4
+                            if (mob[i].speed > cap && Vector.dot(mob[i].velocity, Vector.sub(m.pos, mob[i].position)) > 0) { // if velocity is directed towards player
+                                Matter.Body.setVelocity(mob[i], Vector.mult(Vector.normalise(mob[i].velocity), cap)); //set velocity to cap, but keep the direction
+                            }
+                        }
+                    }
+                    ctx.beginPath();
+                    ctx.arc(m.pos.x, m.pos.y, range, 0, 2 * Math.PI);
+                    ctx.fillStyle = "hsla(200,50%,61%,0.08)";
+                    ctx.fill();
+                }
             }
         }
     },
