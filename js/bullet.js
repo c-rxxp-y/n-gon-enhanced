@@ -8215,7 +8215,7 @@ const b = {
                         bullet[me].endCycle = simulation.cycle + 5000
                         bullet[me].minDmgSpeed = 15
                         // bullet[me].restitution = 0.4
-                        bullet[me].frictionAir = 0.1;
+                        bullet[me].frictionAir = 0;
                         bullet[me].do = function () {
                             const scale = 1 - 0.01 / tech.bulletsLastLonger
                             Matter.Body.scale(this, scale, scale);
