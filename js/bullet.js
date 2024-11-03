@@ -8226,14 +8226,14 @@ const b = {
                     if (tech.isExplodeSnipe) {
                         spread = 0;
                         const END = Math.floor(m.crouch ? 8 : 5);
-                        const totalBullets = 1
+                        const totalBullets = 5
                         let dir = m.angle
                         for (let i = 0; i < totalBullets; i++) { //5 -> 7
                             const me = bullet.length;
                             bullet[me] = Bodies.rectangle(m.pos.x + 50 * Math.cos(m.angle), m.pos.y + 50 * Math.sin(m.angle), 50, 10, b.fireAttributes(dir));
                             const end = END + Math.random() * 50
                             bullet[me].endCycle = 2 * end * tech.bulletsLastLonger + simulation.cycle
-                            const speed = 75 * end / END
+                            const speed = 50 * end / END
                             const dirOff = dir
                             Matter.Body.setVelocity(bullet[me], {
                                 x: speed * Math.cos(dirOff),
