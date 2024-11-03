@@ -8207,13 +8207,13 @@ const b = {
                         const dir = m.angle + (Math.random() - 0.5) * spread
                         bullet[me] = Bodies.rectangle(m.pos.x, m.pos.y, side, side, b.fireAttributes(dir));
                         Composite.add(engine.world, bullet[me]); //add bullet to world
-                        const SPEED = 75 + Math.random() * 2
+                        const SPEED = 50
                         Matter.Body.setVelocity(bullet[me], {
                             x: SPEED * Math.cos(dir),
                             y: SPEED * Math.sin(dir)
                         });
                         bullet[me].endCycle = simulation.cycle + 5000
-                        bullet[me].minDmgSpeed = 15
+                        bullet[me].minDmgSpeed = 1
                         // bullet[me].restitution = 0.4
                         bullet[me].frictionAir = 0;
                         bullet[me].do = function () {
