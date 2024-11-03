@@ -2,8 +2,9 @@
 making mods for the browser game n-gon (https://landgreen.github.io/n-gon/)
 
 # to-do:
-add more shotgun tech
-remove laser edit gun
+- more shotgun tech
+- more sniper tech
+- lifesteal tech
 
 # ideas:
 javelin-type weapon:
@@ -14,5 +15,5 @@ zenith laser:
   an upgraded version of base-game laser, but to use/for it to work takes all components/tech (based on zenith sword from terraria)
 
 # recent patch notes:
-- added new field: ****einstein's shield****
-- added new shotgun tech: ****condensed shot****
+- added new gun: ****sniper****
+- added new sniper tech: ****explosive hollow-points****
