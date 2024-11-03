@@ -4,7 +4,7 @@ const b = {
     // dmgScale: null, //scales all damage, but not raw .dmg
     gravity: 0.0006, //most other bodies have   gravity = 0.001
     activeGun: null, //current gun in use by player
-    inventoryGun: 11,
+    inventoryGun: 12,
     inventory: [], //list of what guns player has  // 0 starts with basic gun
     setFireMethod() {
         if (tech.isFireMoveLock) {
@@ -5926,7 +5926,7 @@ const b = {
     //9 harpoon
     //10 mine
     //11 laser
-    //12 sword
+    //12 sniper
     guns: [
         {
             name: "nail gun", // 0
@@ -8169,264 +8169,96 @@ const b = {
             },
         },
         {
-            name: "laser edit", //13
+            name: "sniper", //12
+            // description: `fire a wide <strong>burst</strong> of short range <strong> bullets</strong><br>with a low <strong><em>fire rate</em></strong><br><strong>3-4</strong> nails per ${powerUps.orb.ammo()}`,
             descriptionFunction() {
-                return `emit a <strong>beam</strong> of collimated coherent <strong class='color-laser'>light</strong><br>reflects off map, <strong class='color-block'>blocks</strong>, and mobs <strong>${(tech.isWideLaser || tech.isPulseLaser) ? 0 : tech.laserReflections}</strong> times<br>costs <strong>${(tech.laserDrain * 6000).toFixed(1)}</strong> <strong class='color-f'>energy</strong> per second and 0 <strong>ammo</strong>`
+                return `fires a <strong>high caliber</strong> long-range shot <strong></strong><br>has a very slow <strong><em>fire rate</em></strong><br><strong>${this.ammoPack.toFixed(1)}</strong> shots per ${powerUps.orb.ammo()}`
             },
             ammo: 0,
-            ammoPack: Infinity,
-            defaultAmmoPack: Infinity,
+            ammoPack: 1,
+            defaultAmmoPack: 1,
             have: false,
-            charge: 0,
-            isStuckOn: false,
-            angle: 0,
-            do() { },
-            fire() { },
-            chooseFireMethod() {
-                this.fire = this.fireWideBeam
-            //     this.lensDamage = 1
-            //     if (tech.isLaserLens) {
-            //         this.do = this.lens
-            //     } else {
-            //         this.do = this.stuckOn
-            //     }
-            //     if (tech.isPulseLaser) {
-            //         this.fire = () => {
-            //             const drain = Math.min(0.9 * m.maxEnergy, 0.01 * (tech.isCapacitor ? 10 : 1) / b.fireCDscale)
-            //             if (m.energy > drain && this.charge < 50 * m.maxEnergy) {
-            //                 m.energy -= drain
-            //                 this.charge += drain * 100
-            //             }
-            //         }
-            //         if (tech.historyLaser) {
-            //             const len = 1 + tech.historyLaser
-            //             const spacing = Math.ceil(30 - 2 * tech.historyLaser)
-            //             this.do = () => {
-            //                 if (tech.isLaserLens) this.lens()
-            //                 if (this.charge > 0) {
-            //                     //draw charge level
-            //                     const mag = 4.1 * Math.sqrt(this.charge)
-            //                     ctx.beginPath();
-            //                     for (let i = 0; i < len; i++) {
-            //                         const history = m.history[(m.cycle - i * spacing) % 600]
-            //                         const off = history.yOff - 24.2859
-            //                         ctx.moveTo(history.position.x, history.position.y - off);
-            //                         ctx.ellipse(history.position.x, history.position.y - off, mag, mag * 0.65, history.angle, 0, 2 * Math.PI)
-            //                     }
-            //                     ctx.fillStyle = `rgba(255,0,0,${0.09 * Math.sqrt(this.charge)})`;
-            //                     ctx.fill();
-            //                     //fire
-            //                     if (!input.fire) {
-            //                         if (this.charge > 5) {
-            //                             m.fireCDcycle = m.cycle + Math.floor(35 * b.fireCDscale); // cool down
-            //                             for (let i = 0; i < len; i++) {
-            //                                 const history = m.history[(m.cycle - i * spacing) % 600]
-            //                                 const off = history.yOff - 24.2859
-            //                                 b.pulse(1.65 * this.charge * this.lensDamage, history.angle, {
-            //                                     x: history.position.x,
-            //                                     y: history.position.y - off
-            //                                 })
-            //                             }
-            //                         }
-            //                         this.charge = 0;
-            //                     }
-            //                 }
-            //             };
-            //         } else {
-            //             this.do = () => {
-            //                 if (tech.isLaserLens) this.lens()
-            //                 if (this.charge > 0) {
-            //                     //draw charge level
-            //                     ctx.beginPath();
-            //                     ctx.arc(m.pos.x, m.pos.y, 4.2 * Math.sqrt(this.charge), 0, 2 * Math.PI);
-            //                     // ctx.fillStyle = `rgba(255,0,0,${0.09 * Math.sqrt(this.charge)})`;
-            //                     ctx.fillStyle = `rgba(255,0,0,${0.09 * Math.sqrt(this.charge)})`;
-            //                     ctx.fill();
-            //                     //fire  
-            //                     if (!input.fire) {
-            //                         if (this.charge > 5) {
-            //                             m.fireCDcycle = m.cycle + Math.floor(35 * b.fireCDscale); // cool down
-            //                             if (tech.beamSplitter) {
-            //                                 const divergence = m.crouch ? 0.15 : 0.35
-            //                                 const angle = m.angle - tech.beamSplitter * divergence / 2
-            //                                 for (let i = 0; i < 1 + tech.beamSplitter; i++) b.pulse(this.charge, angle + i * divergence)
-            //                             } else {
-            //                                 b.pulse(1.8 * this.charge * this.lensDamage, m.angle)
-            //                             }
-            //                         }
-            //                         this.charge = 0;
-            //                     }
-            //                 }
-            //             };
-            //         }
-
-            //     } else if (tech.beamSplitter) {
-            //         this.fire = this.fireSplit
-            //     } else if (tech.historyLaser) {
-            //         this.fire = this.fireHistory
-            //     } else if (tech.isWideLaser) {
-            //         this.fire = this.fireWideBeam
-            //     } else {
-            //         this.fire = this.fireLaser
-            //     }
-            //     // this.fire = this.firePhoton
-            },
-            // fireLaser() {
-            //     const drain = tech.laserDrain / b.fireCDscale
-            //     if (m.energy < drain) {
-            //         m.fireCDcycle = m.cycle + 100; // cool down if out of energy
-            //     } else {
-            //         m.fireCDcycle = m.cycle
-            //         m.energy -= drain
-            //         const where = {
-            //             x: m.pos.x + 20 * Math.cos(m.angle),
-            //             y: m.pos.y + 20 * Math.sin(m.angle)
-            //         }
-            //         b.laser(where, {
-            //             x: where.x + 3000 * Math.cos(m.angle),
-            //             y: where.y + 3000 * Math.sin(m.angle)
-            //         }, tech.laserDamage / b.fireCDscale * this.lensDamage);
-            //     }
-            // },
-            // firePulse() { },
-            // fireSplit() {
-            //     const drain = tech.laserDrain / b.fireCDscale
-            //     if (m.energy < drain) {
-            //         m.fireCDcycle = m.cycle + 100; // cool down if out of energy
-            //     } else {
-            //         m.fireCDcycle = m.cycle
-            //         m.energy -= drain
-            //         // const divergence = m.crouch ? 0.15 : 0.2
-            //         // const scale = Math.pow(0.9, tech.beamSplitter)
-            //         // const pushScale = scale * scale
-            //         let dmg = tech.laserDamage / b.fireCDscale * this.lensDamage // * scale //Math.pow(0.9, tech.laserDamage)
-            //         const where = { x: m.pos.x + 20 * Math.cos(m.angle), y: m.pos.y + 20 * Math.sin(m.angle) }
-            //         const divergence = m.crouch ? 0.15 : 0.35
-            //         const angle = m.angle - tech.beamSplitter * divergence / 2
-            //         for (let i = 0; i < 1 + tech.beamSplitter; i++) {
-            //             b.laser(where, {
-            //                 x: where.x + 3000 * Math.cos(angle + i * divergence),
-            //                 y: where.y + 3000 * Math.sin(angle + i * divergence)
-            //             }, dmg, tech.laserReflections, false)
-            //         }
-            //     }
-            // },
-            fireWideBeam() {
-                const drain = tech.laserDrain / b.fireCDscale
-                if (m.energy < drain) {
-                    m.fireCDcycle = m.cycle + 0; // cool down if out of energy
-                } else {
-                    m.fireCDcycle = m.cycle
-                    m.energy -= drain
-                    const range = {
-                        x: 5000 * Math.cos(m.angle),
-                        y: 5000 * Math.sin(m.angle)
-                    }
-                    const rangeOffPlus = {
-                        x: 7.5 * Math.cos(m.angle + Math.PI / 2),
-                        y: 7.5 * Math.sin(m.angle + Math.PI / 2)
-                    }
-                    const rangeOffMinus = {
-                        x: 7.5 * Math.cos(m.angle - Math.PI / 2),
-                        y: 7.5 * Math.sin(m.angle - Math.PI / 2)
-                    }
-                    const dmg = 1 * tech.laserDamage / b.fireCDscale * this.lensDamage //  3.5 * 0.55 = 200% more damage
-                    const where = {
-                        x: m.pos.x + 30 * Math.cos(m.angle),
-                        y: m.pos.y + 30 * Math.sin(m.angle)
-                    }
-                    const eye = {
-                        x: m.pos.x + 15 * Math.cos(m.angle),
-                        y: m.pos.y + 15 * Math.sin(m.angle)
-                    }
-                    ctx.strokeStyle = tech.laserColor;
-                    ctx.lineWidth = 20
-                    ctx.globalAlpha = 0.5;
+            do() {
+                // draw loop around player head
+                const left = m.fireCDcycle !== Infinity ? 0.05 * Math.max(m.fireCDcycle - m.cycle, 0) : 0
+                if (left > 0) {
                     ctx.beginPath();
-                    if (Matter.Query.ray(map, eye, where).length === 0 && Matter.Query.ray(body, eye, where).length === 0) {
-                        b.laser(eye, {
-                            x: eye.x + range.x,
-                            y: eye.y + range.y
-                        }, dmg, 0, true, 0.3)
-                    }
-                    for (let i = 1; i < tech.wideLaser; i++) {
-                        let whereOff = Vector.add(where, {
-                            x: i * rangeOffPlus.x,
-                            y: i * rangeOffPlus.y
-                        })
-                        if (Matter.Query.ray(map, eye, whereOff).length === 0 && Matter.Query.ray(body, eye, whereOff).length === 0) {
-                            ctx.moveTo(eye.x, eye.y)
-                            ctx.lineTo(whereOff.x, whereOff.y)
-                            b.laser(whereOff, {
-                                x: whereOff.x + range.x,
-                                y: whereOff.y + range.y
-                            }, dmg, 0, true, 0.3)
-                        }
-                        whereOff = Vector.add(where, {
-                            x: i * rangeOffMinus.x,
-                            y: i * rangeOffMinus.y
-                        })
-                        if (Matter.Query.ray(map, eye, whereOff).length === 0 && Matter.Query.ray(body, eye, whereOff).length === 0) {
-                            ctx.moveTo(eye.x, eye.y)
-                            ctx.lineTo(whereOff.x, whereOff.y)
-                            b.laser(whereOff, {
-                                x: whereOff.x + range.x,
-                                y: whereOff.y + range.y
-                            }, dmg, 0, true, 0.3)
-                        }
-                    }
+                    // ctx.arc(simulation.mouseInGame.x, simulation.mouseInGame.y, 30, 0, left);
+                    ctx.arc(m.pos.x, m.pos.y, 28, m.angle - left, m.angle);
+                    // ctx.fillStyle = "rgba(0,0,0,0.3)" //"#333"
+                    // ctx.fill();
+                    ctx.strokeStyle = "#333";
+                    ctx.lineWidth = 2;
                     ctx.stroke();
-                    if (tech.isLaserLens && b.guns[11].lensDamage !== 1) {
-                        ctx.lineWidth = 20 + 3 * b.guns[11].lensDamageOn
-                        ctx.globalAlpha = 0.3
-                        ctx.stroke();
-                    }
-                    ctx.globalAlpha = 1;
                 }
-            },
-            fireHistory() {
-                drain = tech.laserDrain / b.fireCDscale
-                if (m.energy < drain) {
-                    m.fireCDcycle = m.cycle + 100; // cool down if out of energy
-                } else {
-                    m.fireCDcycle = m.cycle
-                    m.energy -= drain
-                    const dmg = tech.laserDamage / b.fireCDscale * this.lensDamage
-                    const spacing = Math.ceil(23 - tech.historyLaser)
-                    ctx.beginPath();
-                    b.laser({
-                        x: m.pos.x + 20 * Math.cos(m.angle),
-                        y: m.pos.y + 20 * Math.sin(m.angle)
-                    }, {
-                        x: m.pos.x + 3000 * Math.cos(m.angle),
-                        y: m.pos.y + 3000 * Math.sin(m.angle)
-                    }, dmg);
 
-                    for (let i = 1, len = 1 + tech.historyLaser; i < len; i++) {
-                        const history = m.history[(m.cycle - i * spacing) % 600]
-                        const off = history.yOff - 24.2859 + 2 * i
-                        // ctx.globalAlpha = 0.13
-                        b.laser({
-                            x: history.position.x + 20 * Math.cos(history.angle),
-                            y: history.position.y + 20 * Math.sin(history.angle) - off
-                        }, {
-                            x: history.position.x + 3000 * Math.cos(history.angle),
-                            y: history.position.y + 3000 * Math.sin(history.angle) - off
-                        }, 0.7 * dmg, tech.laserReflections, true);
-                    }
-                    // ctx.globalAlpha = 1
-                    ctx.strokeStyle = tech.laserColor;
-                    ctx.lineWidth = 1
-                    ctx.stroke();
-                    if (tech.isLaserLens && b.guns[11].lensDamage !== 1) {
-                        ctx.strokeStyle = tech.laserColor;
-                        ctx.lineWidth = 10 + 2 * b.guns[11].lensDamageOn
-                        ctx.globalAlpha = 0.2
-                        ctx.stroke(); //glow
-                        ctx.globalAlpha = 1;
+            },
+            fire() {
+                let knock, spread
+                const coolDown = function () {
+                    spread = 0
+                    m.fireCDcycle = m.cycle + Math.floor((150) * b.fireCDscale) // cool down
+                    knock = 0.01
+                }
+                const spray = (num) => {
+                    const side = 22
+                    for (let i = 0; i < num; i++) {
+                        const me = bullet.length;
+                        const dir = m.angle + (Math.random() - 0.5) * spread
+                        bullet[me] = Bodies.rectangle(m.pos.x, m.pos.y, side, side, b.fireAttributes(dir));
+                        Composite.add(engine.world, bullet[me]); //add bullet to world
+                        const SPEED = 75 + Math.random() * 2
+                        Matter.Body.setVelocity(bullet[me], {
+                            x: SPEED * Math.cos(dir),
+                            y: SPEED * Math.sin(dir)
+                        });
+                        bullet[me].endCycle = simulation.cycle + 5000
+                        bullet[me].minDmgSpeed = 15
+                        // bullet[me].restitution = 0.4
+                        bullet[me].frictionAir = 0.1;
+                        bullet[me].do = function () {
+                            const scale = 1 - 0.01 / tech.bulletsLastLonger
+                            Matter.Body.scale(this, scale, scale);
+                        };
                     }
                 }
-            },
+                const chooseBulletType = function () {
+                    if (tech.isExplodeSnipe) {
+                        spread = 0;
+                        const END = Math.floor(m.crouch ? 8 : 5);
+                        const totalBullets = 1
+                        let dir = m.angle
+                        for (let i = 0; i < totalBullets; i++) { //5 -> 7
+                            const me = bullet.length;
+                            bullet[me] = Bodies.rectangle(m.pos.x + 50 * Math.cos(m.angle), m.pos.y + 50 * Math.sin(m.angle), 50, 10, b.fireAttributes(dir));
+                            const end = END + Math.random() * 50
+                            bullet[me].endCycle = 2 * end * tech.bulletsLastLonger + simulation.cycle
+                            const speed = 75 * end / END
+                            const dirOff = dir
+                            Matter.Body.setVelocity(bullet[me], {
+                                x: speed * Math.cos(dirOff),
+                                y: speed * Math.sin(dirOff)
+                            });
+                            bullet[me].onEnd = function () {
+                                b.explosion(this.position, 180 * (tech.isShotgunReversed ? 1.4 : 1) + (Math.random() - 0.5) * 30); //makes bullet do explosive damage at end
+                            }
+                            bullet[me].beforeDmg = function () {
+                                this.endCycle = 0; //bullet ends cycle after hitting a mob and triggers explosion
+                            };
+                            bullet[me].do = function () {
+                                if (Matter.Query.collides(this, map).length) this.endCycle = 0; //bullet ends cycle after hitting a mob and triggers explosion
+                            }
+                            Composite.add(engine.world, bullet[me]); //add bullet to world
+                        }
+                    } else if (!tech.isExplodeSnipe) {
+                    spray(16);
+                    }
+                }
+
+                coolDown();
+                b.muzzleFlash(35);
+                chooseBulletType();
+            }
         },
     ],
 };
