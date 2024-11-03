@@ -4772,6 +4772,25 @@ const tech = {
     //************************************************** tech
     //**************************************************
     {
+        name: "explosive hollow-points",
+        description: "<strong>sniper shots</strong> are <strong class='color-e'>explosive</strong>",
+        isGunTech: true,
+        maxCount: 1,
+        count: 0,
+        frequency: 2,
+        frequencyDefault: 2,
+        allowed() {
+            return (tech.haveGunCheck("sniper"))
+        },
+        requires: "sniper",
+        effect() {
+            tech.isExplodeSnipe = true
+        },
+        remove() {
+            tech.isExplodeSnipe = false
+        }
+    },
+    {
         name: "condensed shot",
         description: "<strong>shotgun spread</strong> is reduced",
         isGunTech: true,
@@ -4784,10 +4803,10 @@ const tech = {
         },
         requires: "shotgun",
         effect() {
-            tech.isCondensedShot = true;
+            tech.isCondensedShot = true
         },
         remove() {
-            tech.isCondensedShot = false;
+            tech.isCondensedShot = false
         }
     },
     {
@@ -7412,9 +7431,9 @@ const tech = {
         frequency: 2,
         frequencyDefault: 2,
         allowed() {
-            return (tech.haveGunCheck("laser") || tech.haveGunCheck("laser edit") && !tech.isPulseLaser) || tech.isLaserBotUpgrade || tech.isLaserField
+            return (tech.haveGunCheck("laser") && !tech.isPulseLaser) || tech.isLaserBotUpgrade || tech.isLaserField
         },
-        requires: "laser, laser edit gun, not pulse",
+        requires: "laser, not pulse",
         effect() {
             tech.isLaserPush = true;
         },
@@ -7539,21 +7558,19 @@ const tech = {
         frequency: 2,
         frequencyDefault: 2,
         allowed() {
-            return tech.haveGunCheck("laser") || tech.haveGunCheck("laser edit") && tech.laserReflections < 3 && !tech.beamSplitter && !tech.isPulseLaser && !tech.historyLaser
+            return tech.haveGunCheck("laser") && tech.laserReflections < 3 && !tech.beamSplitter && !tech.isPulseLaser && !tech.historyLaser
         },
-        requires: "laser gun, laser edit gun, not specular reflection, diffraction grating, slow light, pulse",
+        requires: "laser gun, not specular reflection, diffraction grating, slow light, pulse",
         effect() {
             if (tech.wideLaser === 0) tech.wideLaser = 3
             tech.isWideLaser = true;
             b.guns[11].chooseFireMethod()
-            b.guns[13].chooseFireMethod()
         },
         remove() {
             if (tech.isWideLaser) {
                 // tech.wideLaser = 0
                 tech.isWideLaser = false;
                 b.guns[11].chooseFireMethod()
-                b.guns[13].chooseFireMethod()
             }
         }
     },
@@ -12257,4 +12274,5 @@ const tech = {
     isStaticBlock: null,
     isDamageFieldTech: null,
     isCondensedShot: null,
+    isExplodeSnipe: null,
 }
