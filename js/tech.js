@@ -4772,8 +4772,47 @@ const tech = {
     //************************************************** tech
     //**************************************************
     {
+        name: "optical zoom",
+        description: `<strong>scroll</strong> the mouse wheel to <strong>zoom</strong> in and out`,
+        isGunTech: 1,
+        maxCount: 1,
+        count: 0,
+        frequency: 2,
+        frequencyDefault: 2,
+        allowed() {
+            return (tech.haveGunCheck("sniper"))
+        },
+        requires: "sniper",
+        effect() {
+            tech.isSniperZoom = true
+            simulation.setZoom();
+        },
+        remove() {
+            tech.isSniperZoom = false
+        }
+    },
+    {
+        name: "supplementary angles",
+        description: `<strong>sniper</strong> shoots another bullet in the <strong>opposite</strong> direction`,
+        isGunTech: 1,
+        maxCount: 1,
+        count: 0,
+        frequency: 2,
+        frequencyDefault: 2,
+        allowed() {
+            return (tech.haveGunCheck("sniper"))
+        },
+        requires: "sniper",
+        effect() {
+            tech.isSupplementaryAngle = true
+        },
+        remove() {
+            tech.isSupplementaryAngle = false
+        }
+    },
+    {
         name: "explosive hollow-points",
-        description: "<strong>sniper shots</strong> are <strong class='color-e'>explosive</strong>",
+        description: `<strong>sniper shots</strong> are <strong class='color-e'>explosive</strong>`,
         isGunTech: true,
         maxCount: 1,
         count: 0,
@@ -4792,7 +4831,7 @@ const tech = {
     },
     {
         name: "condensed shot",
-        description: "<strong>shotgun spread</strong> is reduced",
+        description: `<strong>shotgun spread</strong> is reduced`,
         isGunTech: true,
         maxCount: 1,
         count: 0,
@@ -12275,4 +12314,6 @@ const tech = {
     isDamageFieldTech: null,
     isCondensedShot: null,
     isExplodeSnipe: null,
+    isSupplementaryAngle: null,
+    isSniperZoom: null,
 }
