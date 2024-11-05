@@ -2157,17 +2157,6 @@ const simulation = {
         });
         document.getElementById("construct").innerHTML = outHTML
     },
-    techZoom() {
-        if (tech.isSniperZoom) {
-            document.body.addEventListener("wheel", (e) => {
-                if (e.deltaY > 0) {
-                    simulation.setZoom(simulation.zoomScale / 0.9)
-                } else {
-                    simulation.setZoom(simulation.zoomScale * 0.9)
-                }
-            });
-        }
-    }
     // copyToClipBoard(value) {
     //     // Create a fake textarea
     //     const textAreaEle = document.createElement('textarea');
