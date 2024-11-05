@@ -8246,18 +8246,6 @@ const b = {
                     }
                 }
 
-                const isZoom = function () {
-                    if (tech.isSniperZoom) {
-                        document.body.addEventListener("wheel", (e) => {
-                            if (e.deltaY > 0) {
-                                simulation.setZoom(simulation.zoomScale / 0.9)
-                            } else {
-                                simulation.setZoom(simulation.zoomScale * 0.9)
-                            }
-                        });
-                    }
-                }
-
                 const chooseBulletType = function () {
                     if (tech.isExplodeSnipe) {
                         spread = 0;
@@ -8290,7 +8278,6 @@ const b = {
                     spray(16);
                     }
                 }
-                isZoom();
                 coolDown();
                 b.muzzleFlash(35);
                 chooseBulletType();
