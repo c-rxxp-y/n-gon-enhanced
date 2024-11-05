@@ -2,18 +2,13 @@
 making mods for the browser game n-gon (https://landgreen.github.io/n-gon/)
 
 # to-do:
-- more shotgun tech
 - more sniper tech
+- come up with name for the mod (put any ideas in a discussion thread)
 - lifesteal tech
 
 # ideas:
-javelin-type weapon:
-  uses energy to charge up a dash at mouse position (limited range)
-- tech ideas: increase dash range, bigger javelin, explosion on tip of weapon, lifesteal?
-
-zenith laser:
-  an upgraded version of base-game laser, but to use/for it to work takes all components/tech (based on zenith sword from terraria)
+coders block 😢
 
 # recent patch notes:
-- added new gun: ****sniper****
-- added new sniper tech: ****explosive hollow-points****
+- removed default testing/construct mode. you know ****have**** to beat the game to unlock
+- added new sniper tech: ****supplementary angles, optical zoom****
