@@ -401,9 +401,9 @@ const tech = {
         frequencyDefault: 1,
         isSkin: true,
         allowed() {
-            return !m.isAltSkin && !m.isShipMode && !tech.isAlwaysFire
+            return !m.isAltSkin && !m.isShipMode && !tech.isAlwaysFire && !tech.isTacticalEfficiency
         },
-        requires: "not skinned, ship mode, automatic",
+        requires: "not skinned, ship mode, automatic, tactical efficiency",
         effect() {
             tech.isFireMoveLock = true;
             b.setFireCD();
@@ -4772,6 +4772,25 @@ const tech = {
     //************************************************** tech
     //**************************************************
     {
+        name: "tactical efficiency",
+        description: `increased <strong>sniper</strong> fire rate, decreased bullet <strong>speed</strong>`,
+        isGunTech: 1,
+        maxCount: 1,
+        count: 0,
+        frequency: 2,
+        frequencyDefault: 2,
+        allowed() {
+            return (tech.haveGunCheck("sniper")) && !tech.isFireMoveLock
+        },
+        requires: "sniper, not Higgs mechanism",
+        effect() {
+            tech.isTacticalEfficiency = true
+        },
+        remove() {
+            tech.isTacticalEfficiency = false
+        }
+    },
+    {
         name: "optical zoom",
         description: `<strong>scroll</strong> the mouse wheel to <strong>zoom</strong> in and out`,
         isGunTech: 1,
@@ -4785,7 +4804,6 @@ const tech = {
         requires: "sniper",
         effect() {
             tech.isSniperZoom = true
-            simulation.setZoom();
         },
         remove() {
             tech.isSniperZoom = false
@@ -7963,9 +7981,9 @@ const tech = {
         frequency: 2,
         frequencyDefault: 2,
         allowed() {
-            return m.fieldMode === 2 || m.fieldMode === 11
+            return m.fieldMode === 2
         },
-        requires: "perfect diamagnetism, einstein's shield",
+        requires: "perfect diamagnetism",
         effect() {
             tech.isBigField = true;
         },
@@ -12316,4 +12334,5 @@ const tech = {
     isExplodeSnipe: null,
     isSupplementaryAngle: null,
     isSniperZoom: null,
+    isTacticalEfficiency: null,
 }
