@@ -8197,7 +8197,7 @@ const b = {
                 let knock, spread
                 const coolDown = function () {
                     spread = 0
-                    m.fireCDcycle = m.cycle + Math.floor((150) * b.fireCDscale) // cool down
+                    m.fireCDcycle = (m.cycle + Math.floor((150) * b.fireCDscale)) - (tech.isTacticalEfficiency * 10) // cool down
                     knock = 1
                 }
                 const spray = () => {
@@ -8207,7 +8207,7 @@ const b = {
                         const dir = m.angle
                         bullet[me] = Bodies.rectangle(m.pos.x, m.pos.y, 50, 10, b.fireAttributes(dir));
                         Composite.add(engine.world, bullet[me]); //add bullet to world
-                        const SPEED = (60 + Math.random() * 2) - (tech.isTacticalEfficiency * 5)
+                        const SPEED = (200 + Math.random() * 2) - (tech.isTacticalEfficiency * 25)
                         Matter.Body.setVelocity(bullet[me], {
                             x: SPEED * Math.cos(dir),
                             y: SPEED * Math.sin(dir)
@@ -8231,7 +8231,7 @@ const b = {
                             const dir = Math.floor(Math.random() * 360)
                             bullet[me] = Bodies.rectangle(m.pos.x, m.pos.y, 50, 10, b.fireAttributes(dir));
                             Composite.add(engine.world, bullet[me]); //add bullet to world
-                            const SPEED = (60 + Math.random() * 2) - (tech.isTacticalEfficiency * 5)
+                            const SPEED = (200 + Math.random() * 2) - (tech.isTacticalEfficiency * 25)
                             Matter.Body.setVelocity(bullet[me], {
                                 x: SPEED * Math.cos(dir),
                                 y: SPEED * Math.sin(dir)
@@ -8271,7 +8271,7 @@ const b = {
                             bullet[me] = Bodies.rectangle(m.pos.x + 50 * Math.cos(m.angle), m.pos.y + 50 * Math.sin(m.angle), 60, 20, b.fireAttributes(dir));
                             const end = END + Math.random() * 50
                             bullet[me].endCycle = 2 * end * tech.bulletsLastLonger + simulation.cycle
-                            const speed = (60 + Math.random() * 2) - (tech.isTacticalEfficiency * 5)
+                            const speed = (200 + Math.random() * 2) - (tech.isTacticalEfficiency * 25)
                             const dirOff = dir
                             Matter.Body.setVelocity(bullet[me], {
                                 x: speed * Math.cos(dirOff),
