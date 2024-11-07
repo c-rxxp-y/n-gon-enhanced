@@ -4775,7 +4775,7 @@ const tech = {
         name: "tactical efficiency",
         description: `increased <strong>sniper</strong> fire rate, decreased bullet <strong>speed</strong>`,
         isGunTech: 1,
-        maxCount: 1,
+        maxCount: 4,
         count: 0,
         frequency: 2,
         frequencyDefault: 2,
@@ -4784,10 +4784,10 @@ const tech = {
         },
         requires: "sniper, not Higgs mechanism",
         effect() {
-            tech.isTacticalEfficiency = true
+            tech.isTacticalEfficiency += 1
         },
         remove() {
-            tech.isTacticalEfficiency = false
+            tech.isTacticalEfficiency = 0
         }
     },
     {
