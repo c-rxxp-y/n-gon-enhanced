@@ -4810,10 +4810,10 @@ const tech = {
         }
     },
     {
-        name: "supplementary angles",
-        description: `<strong>sniper</strong> shoots another bullet in the <strong>opposite</strong> direction`,
+        name: "additional rounds",
+        description: `<strong>sniper</strong> shoots another bullet in a <strong>random</strong> direction`,
         isGunTech: 1,
-        maxCount: 1,
+        maxCount: 9,
         count: 0,
         frequency: 2,
         frequencyDefault: 2,
@@ -4822,10 +4822,10 @@ const tech = {
         },
         requires: "sniper",
         effect() {
-            tech.isSupplementaryAngle = true
+            tech.isAdditionalRounds += 1
         },
         remove() {
-            tech.isSupplementaryAngle = false
+            tech.isAdditionalRounds = 0
         }
     },
     {
@@ -12335,4 +12335,5 @@ const tech = {
     isSupplementaryAngle: null,
     isSniperZoom: null,
     isTacticalEfficiency: null,
+    isAdditionalRounds: null,
 }
