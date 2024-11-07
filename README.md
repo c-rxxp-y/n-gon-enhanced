@@ -1,14 +1,16 @@
-# n-gon-mods
+# n-gon-enhanced
 making mods for the browser game n-gon (https://landgreen.github.io/n-gon/)
 
 # to-do:
-- more sniper tech
-- come up with name for the mod (put any ideas in a discussion thread)
-- lifesteal tech
+🤷 got most of my necessary stuff done, now fun stuff
 
 # ideas:
-coders block 😢
+- lifesteal tech
 
 # recent patch notes:
-- removed default testing/construct mode. you know ****have**** to beat the game to unlock
-- added new sniper tech: ****supplementary angles, optical zoom****
+- reworked supplementary angles, now its called ****additional rounds****. instead of firing in reverse direciton, it fires at random (****stackable****)
+- new guntech: ****tactical efficiency****, increases sniper firerate and decreases bullet speed (slightly, dont worry too much lol)
+- increased sniper damage
+- fixed low sniper damage bug, properly shoots now
+- bigger sniper bullets
+- einstein's shield description change
