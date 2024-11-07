@@ -5752,7 +5752,7 @@ const m = {
     },
     {
         name: "einstein's shield",
-        description: `<strong>shield</strong> maintains <strong>functionality</strong> while inactive<br><strong>4</strong> <strong class='color-f'>energy</strong> per second`,
+        description: `<strong>shield</strong> maintains <strong>functionality</strong> while inactive<br>allows <strong>slow fall</strong><br><strong>4</strong> <strong class='color-f'>energy</strong> per second`,
         effect: () => {
             m.fieldMeterColor = "#48f" //"#0c5"
             m.eyeFillColor = m.fieldMeterColor
@@ -5984,8 +5984,8 @@ const m = {
                     ctx.fill();
                 }
             }
-        }
-    },
+        },
+    }
     ],
     //************************************************************************************
     //************************************************************************************
