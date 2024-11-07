@@ -8198,16 +8198,16 @@ const b = {
                 const coolDown = function () {
                     spread = 0
                     m.fireCDcycle = m.cycle + Math.floor((150) * b.fireCDscale) // cool down
-                    knock = 0.01
+                    knock = 1
                 }
-                const spray = (num) => {
-                    const side = 22
-                    for (let i = 0; i < num; i++) {
+                const spray = () => {
+                    const totalBullets = 3;
+                    for (let i = 0; i < totalBullets; i++) {
                         const me = bullet.length;
-                        const dir = m.angle + (Math.random() - 0.5) * spread
-                        bullet[me] = Bodies.rectangle(m.pos.x, m.pos.y, side, side, b.fireAttributes(dir));
+                        const dir = m.angle
+                        bullet[me] = Bodies.rectangle(m.pos.x, m.pos.y, 50, 10, b.fireAttributes(dir));
                         Composite.add(engine.world, bullet[me]); //add bullet to world
-                        const SPEED = 50 - (tech.isTacticalEfficiency)
+                        const SPEED = (60 + Math.random() * 2) - (tech.isTacticalEfficiency * 5)
                         Matter.Body.setVelocity(bullet[me], {
                             x: SPEED * Math.cos(dir),
                             y: SPEED * Math.sin(dir)
@@ -8223,26 +8223,28 @@ const b = {
                     }
                 }
 
-                const doubleShot = function () {
-                    if (tech.isSupplementaryAngle) {
-                        const side = 22;
-                        const me = bullet.length;
-                        const dirRev = m.angle + 135
-                        bullet[me] = Bodies.rectangle(m.pos.x, m.pos.y, side, side, b.fireAttributes(dirRev));
-                        Composite.add(engine.world, bullet[me]); //add bullet to world
-                        const SPEED = 57 - (tech.isTacticalEfficiency * 7)
-                        Matter.Body.setVelocity(bullet[me], {
-                            x: SPEED * Math.cos(dirRev),
-                            y: SPEED * Math.sin(dirRev)
-                        });
-                        bullet[me].endCycle = simulation.cycle + 5000
-                        bullet[me].minDmgSpeed = 1
-                        // bullet[me].restitution = 0.4
-                        bullet[me].frictionAir = 0.005;
-                        bullet[me].do = function () {
-                            const scale = 1 - 0.01 / tech.bulletsLastLonger
-                            Matter.Body.scale(this, scale, scale);
-                        };
+                const multiShot = function () {
+                    if (tech.isAdditionalRounds >= 0) {
+                        const totalBullets = tech.isAdditionalRounds
+                        for (let i = 0; i < totalBullets; i++) {
+                            const me = bullet.length;
+                            const dir = Math.floor(Math.random() * 360)
+                            bullet[me] = Bodies.rectangle(m.pos.x, m.pos.y, 50, 10, b.fireAttributes(dir));
+                            Composite.add(engine.world, bullet[me]); //add bullet to world
+                            const SPEED = (60 + Math.random() * 2) - (tech.isTacticalEfficiency * 5)
+                            Matter.Body.setVelocity(bullet[me], {
+                                x: SPEED * Math.cos(dir),
+                                y: SPEED * Math.sin(dir)
+                            });
+                            bullet[me].endCycle = simulation.cycle + 5000
+                            bullet[me].minDmgSpeed = 1
+                            // bullet[me].restitution = 0.4
+                            bullet[me].frictionAir = 0.005;
+                            bullet[me].do = function () {
+                                const scale = 1 - 0.01 / tech.bulletsLastLonger
+                                Matter.Body.scale(this, scale, scale);
+                            };
+                        }
                     }
                 }
 
@@ -8250,9 +8252,9 @@ const b = {
                     if (tech.isSniperZoom) {
                         document.body.addEventListener("wheel", (e) => {
                             if (e.deltaY > 0) {
-                                simulation.setZoom(simulation.zoomScale - 15)
+                                simulation.setZoom(simulation.zoomScale - 10)
                             } else {
-                                simulation.setZoom(simulation.zoomScale + 15)
+                                simulation.setZoom(simulation.zoomScale + 10)
                             }
                         });
                     }
@@ -8262,14 +8264,14 @@ const b = {
                     if (tech.isExplodeSnipe) {
                         spread = 0;
                         const END = Math.floor(m.crouch ? 8 : 5);
-                        const totalBullets = 3
+                        const totalBullets = 2
                         let dir = m.angle
-                        for (let i = 0; i < totalBullets; i++) { //5 -> 7
+                        for (let i = 0; i < totalBullets; i++) {
                             const me = bullet.length;
-                            bullet[me] = Bodies.rectangle(m.pos.x + 50 * Math.cos(m.angle), m.pos.y + 50 * Math.sin(m.angle), 50, 10, b.fireAttributes(dir));
+                            bullet[me] = Bodies.rectangle(m.pos.x + 50 * Math.cos(m.angle), m.pos.y + 50 * Math.sin(m.angle), 60, 20, b.fireAttributes(dir));
                             const end = END + Math.random() * 50
                             bullet[me].endCycle = 2 * end * tech.bulletsLastLonger + simulation.cycle
-                            const speed = 50 - (tech.isTacticalEfficiency * 5)
+                            const speed = (60 + Math.random() * 2) - (tech.isTacticalEfficiency * 5)
                             const dirOff = dir
                             Matter.Body.setVelocity(bullet[me], {
                                 x: speed * Math.cos(dirOff),
@@ -8294,7 +8296,7 @@ const b = {
                 coolDown();
                 b.muzzleFlash(35);
                 chooseBulletType();
-                doubleShot();
+                multiShot();
             }
         },
     ],
