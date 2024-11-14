@@ -8,6 +8,9 @@ making mods for the browser game n-gon (https://landgreen.github.io/n-gon/)
 - lifesteal tech
 
 # recent patch notes:
+11/14/2024
+- added new vanilla n-gon level
+
 11/7/2024
 - increased sniper bullet speed: 60 -> 200 (again)
 - made tactical efficiency stackable up to 4
