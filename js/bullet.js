@@ -7951,6 +7951,12 @@ const b = {
                     }
                 }
 
+                const isSniperDefense = function () {
+                    if (tech.isSniperDefense) {
+                        m.fieldHarmReduction = 0.75
+                    }
+                }
+
                 const isZoom = function () {
                     if (tech.isSniperZoom) {
                         document.body.addEventListener("wheel", (e) => {
@@ -7995,6 +8001,7 @@ const b = {
                     spray(16);
                     }
                 }
+                isSniperDefense();
                 isZoom();
                 coolDown();
                 b.muzzleFlash(35);
