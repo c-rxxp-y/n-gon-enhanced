@@ -2,10 +2,11 @@
 making mods for the browser game n-gon (https://landgreen.github.io/n-gon/)
 
 # to-do:
-🤷 got most of my necessary stuff done, now fun stuff
+add quick teleport tech
 
 # ideas:
 - lifesteal tech
+- melee weapon
 
 # recent patch notes:
 11/16/24
