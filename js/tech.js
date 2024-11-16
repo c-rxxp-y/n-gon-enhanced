@@ -4768,6 +4768,26 @@ const tech = {
     //************************************************** tech
     //**************************************************
     {
+        name: "focused shielding",
+        description: "while <strong>sniper</strong> is equiped <strong>0.75x</strong> <strong class='color-defense'>damage taken</strong>",
+        isGunTech: true,
+        maxCount: 1,
+        count: 0,
+        isInstant: true,
+        frequency: 2,
+        frequencyDefault: 2,
+        allowed() {
+            return (tech.haveGunCheck("sniper"))
+        },
+        requires: "sniper",
+        effect() {
+            tech.isSniperDefense = true
+        },
+        remove() {
+            tech.isSniperDefense = false
+        }
+    },
+    {
         name: "tactical efficiency",
         description: `increased <strong>sniper</strong> fire rate, decreased bullet <strong>speed</strong>`,
         isGunTech: 1,
