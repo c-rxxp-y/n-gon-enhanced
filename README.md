@@ -10,7 +10,7 @@ making mods for the browser game n-gon (https://landgreen.github.io/n-gon/)
 # recent patch notes:
 11/16/24
 - new sniper tech
-- ****Focused Sheilding****: when sniper is equiped, ****0.75x damage taken****
+- ****focused sheilding****: when sniper is equiped, ****0.75x damage taken****
 
 11/14/2024
 - added new vanilla n-gon level
