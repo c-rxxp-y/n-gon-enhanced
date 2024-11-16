@@ -12354,4 +12354,5 @@ const tech = {
     isSniperZoom: null,
     isTacticalEfficiency: null,
     isAdditionalRounds: null,
+    isSniperDefense: null,
 }
