@@ -9,25 +9,33 @@ add quick teleport tech
 - melee weapon
 
 # recent patch notes:
-11/17/24
+****11/17/24****
 - new field
 
 ![image](https://github.com/user-attachments/assets/5d31dc7c-2667-48ab-8bd2-4c9e657774fe)
 
-11/16/24
+****11/16/24****
 - new sniper tech
-- ****focused sheilding****: when sniper is equiped, ****0.75x damage taken****
 
-11/14/2024
+![image](https://github.com/user-attachments/assets/6594eb55-217b-4a24-a2ab-b835ec680e95)
+
+
+****11/14/2024****
 - added new vanilla n-gon level
 
-11/7/2024
+
+****11/7/2024****
 - increased sniper bullet speed: 60 -> 200 (again)
 - made tactical efficiency stackable up to 4
 
-11/6/2024
-- reworked supplementary angles, now its called ****additional rounds****. instead of firing in reverse direciton, it fires at random (****stackable****)
-- new guntech: ****tactical efficiency****, increases sniper firerate and decreases bullet speed
+
+****11/6/2024****
+- new sniper techs
+
+![image](https://github.com/user-attachments/assets/30ddb7b3-72f2-4279-855b-27bf9bdee58b)
+
+![image](https://github.com/user-attachments/assets/e4cdde6c-c92c-46e6-a7dc-d94b5c125305)
+
 - increased sniper speed
 - fixed low sniper damage bug, properly shoots now
 - bigger sniper bullets
