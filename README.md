@@ -9,6 +9,11 @@ add quick teleport tech
 - melee weapon
 
 # recent patch notes:
+11/17/24
+- new field
+
+![image](https://github.com/user-attachments/assets/5d31dc7c-2667-48ab-8bd2-4c9e657774fe)
+
 11/16/24
 - new sniper tech
 - ****focused sheilding****: when sniper is equiped, ****0.75x damage taken****
