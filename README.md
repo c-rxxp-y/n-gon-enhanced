@@ -2,17 +2,14 @@
 making mods for the browser game n-gon (https://landgreen.github.io/n-gon/)
 
 # to-do:
-add quick teleport tech
-
-# ideas:
-- lifesteal tech
-- melee weapon
+add matter displacement tech
 
 # recent patch notes:
 ****11/17/24****
 - new field
 
-![image](https://github.com/user-attachments/assets/5d31dc7c-2667-48ab-8bd2-4c9e657774fe)
+![image](https://github.com/user-attachments/assets/948ccbc3-a479-4dae-a3f7-c92423824295)
+
 
 ****11/16/24****
 - new sniper tech
