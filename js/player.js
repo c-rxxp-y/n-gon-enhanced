@@ -2889,6 +2889,11 @@ const m = {
                         m.holdingTarget.restitution = 0.999 //extra bouncy
                         m.holdingTarget.friction = m.holdingTarget.frictionStatic = m.holdingTarget.frictionAir = 0.001
                     }
+                    if (tech.isBlockHeal && (Math.random() < 0.2)) {
+                        let massScale = Math.min(65 * Math.sqrt(m.maxHealth), 14 * Math.pow(m.holdingTarget.mass, 0.4))
+                        if (powerUps.healGiveMaxEnergy) massScale = powerUps["heal"].size()
+                        powerUps.spawn(m.pos.x, m.pos.y, "heal", true, massScale * (simulation.healScale ** 0.25) * Math.sqrt(tech.largerHeals * (tech.isHalfHeals ? 0.5 : 1)))  //    spawn(x, y, target, moving = true, mode = null, size = powerUps[target].size()) {
+                    }
                     //check every second to see if player is away from thrown body, and make solid
                     const solid = function (that) {
                         const dx = that.position.x - player.position.x;
