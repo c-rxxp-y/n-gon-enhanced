@@ -5,6 +5,12 @@ making mods for the browser game n-gon (https://landgreen.github.io/n-gon/)
 add matter displacement tech
 
 # recent patch notes:
+****11/20/24****
+- new tech
+
+![image](https://github.com/user-attachments/assets/f8a03ce7-3a0f-4cdd-b2c2-714edba0d7cf)
+
+
 ****11/17/24****
 - new field
 
