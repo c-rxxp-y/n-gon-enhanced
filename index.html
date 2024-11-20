@@ -17,7 +17,7 @@
     <link rel='shortcut icon' href='favicon.ico' type='image/x-icon' />
 </head>
 
-<body onload="lore.unlockTesting()" onload="simulation.enableConstructMode()">
+<body onload="lore.unlockTesting(), simulation.enableConstructMode()">
     <div id='guns'></div>
     <div id='field'></div>
     <div id='right-HUD-constraint'></div>
@@ -66,6 +66,9 @@
                         <option value="60">60 fps</option>
                         <option value="45">45 fps</option>
                         <option value="30">30 fps</option>
+                        <option value="15">15 fps</option>
+                        <option value="10">10 fps</option>
+                        <option value="3">3 fps</option>
                     </select>
                     <br>
                     <br>
@@ -170,8 +173,14 @@
         </div>
         <div>
             <details id="updates">
-                <summary>updates</summary>
+                <summary>vanilla updates</summary>
                 <div id="updates-div" class="details-div" style="font-size: 70%;height: 400px;overflow: scroll;max-width: 800px;"></div>
+            </details>
+        </div>
+        <div>
+            <details id="mod-updates">
+                <summary>mod updates</summary>
+                <div id="mod-updates-div" class="details-div" style="font-size: 70%;height: 400px;overflow: scroll;max-width: 800px;"></div>
             </details>
         </div>
         <div>
