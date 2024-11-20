@@ -1491,6 +1491,21 @@ summary {
     }
 }
 
+@keyframes enhanced {
+    0% {
+        opacity: 0%;
+        letter-spacing: 0px;
+        font-size: 96px;
+        fill: #919191;
+    }
+    100% {
+        opacity: 100%;
+        font-size: 72px;
+        letter-spacing: 60px;
+        fill: black;
+    }
+}
+
 .draw-lines {
     stroke-dasharray: 20;
     stroke-dashoffset: 20;
@@ -1548,7 +1563,16 @@ summary {
     animation: dash 2.5s ease-in forwards;
 }
 
-
+.enhanced {
+    font-family: "doto", sans-serif;
+    writing-mode: horizontal-tb;
+    stroke-dasharray: 150;
+    stroke-dashoffset: 150;
+    font-size: 48px;
+    letter-spacing: 60px;
+    fill: black;
+    animation: enhanced 2.5s 2s ease-in-out forwards;
+}
 
 .grid-container {
     display: grid;
@@ -1699,7 +1723,7 @@ summary {
     /* box-shadow: 4px 4px 4px hsla(240, 0%, 17%, 0.14); */
 }
 
-.tooltip {}
+/*.tooltip {}*/
 
 .tooltip .tooltiptext {
     visibility: hidden;
