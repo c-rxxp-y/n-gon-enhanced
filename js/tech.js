@@ -647,6 +647,24 @@ const tech = {
         }
     },
     {
+        name: "mass-energy ratio",
+        description: `throwing a <strong>block</strong> has a chance to spawn a ${powerUps.orb.heal()} proportionate to block <strong>size</strong>`,
+        maxCount: 1,
+        count: 0,
+        frequency: 2,
+        frequencyDefault: 2,
+        allowed() {
+            return !tech.isTokamak
+        },
+        requires: "not tokamak",
+        effect() {
+            tech.isBlockHeal = true
+        },
+        remove() {
+            tech.isBlockHeal = false
+        }
+    },
+    {
         name: "causality bots",
         link: `<a target="_blank" href='https://en.wikipedia.org/wiki/Causality' class="link">causality bots</a>`,
         description: "when you <strong class='color-rewind'>rewind</strong> build scrap <strong class='color-bot'>bots</strong><br>that protect you for about <strong>9</strong> seconds",
