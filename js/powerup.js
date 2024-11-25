@@ -467,6 +467,10 @@ const powerUps = {
             for (let i = 0; i < level.uniqueLevels.length; i++) {
                 text += `<div class="choose-grid-module" style="font-size: 1rem;padding-left:5px;" onclick="powerUps.warp.load('${level.uniqueLevels[i]}')">${level.uniqueLevels[i]}</div>`   //id="uniqueLevels-warp-${i}"
             }
+            text += `<div class="choose-grid-module" style="color:rgb(110,155,160);background-color:#444;text-align:center;">level.enhancedLevels</div>`
+            for (let i = 0; i < level.enhancedLevels.length; i++) {
+                text += `<div class="choose-grid-module" style="padding-left:5px;" onclick="powerUps.warp.load('${level.enhancedLevels[i]}')">${level.enhancedLevels[i]}</div>`
+            }
             text += `<div class="choose-grid-module" style="color:rgb(110,155,160);background-color:#444;text-align:center;">level.playableLevels</div>`
             for (let i = 0; i < level.playableLevels.length; i++) {
                 text += `<div class="choose-grid-module" style="padding-left:5px;" onclick="powerUps.warp.load('${level.playableLevels[i]}')">${level.playableLevels[i]}</div>`
