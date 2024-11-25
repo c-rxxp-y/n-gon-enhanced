@@ -1626,6 +1626,12 @@ window.addEventListener("keydown", function (event) {
             case "8":
                 spawn.randomLevelBoss(simulation.mouseInGame.x, simulation.mouseInGame.y);
                 break
+            case "9":
+                powerUps.directSpawn(simulation.mouseInGame.x, simulation.mouseInGame.y, "instructions")
+                break
+            case "0":
+                powerUps.directSpawn(simulation.mouseInGame.x, simulation.mouseInGame.y, "warp")
+                break
             case "f":
                 const mode = (m.fieldMode === m.fieldUpgrades.length - 1) ? 0 : m.fieldMode + 1
                 m.setField(mode)
@@ -1690,6 +1696,13 @@ window.addEventListener("keydown", function (event) {
                 document.getElementById("field").style.display = "none"
                 document.getElementById("guns").style.display = "none"
                 document.getElementById("right-HUD").style.display = "none"
+                break
+            case "v":
+                if (!tech.isBuilderMode) {
+                    tech.giveTech("building tools")
+                } else if (tech.isBuilderMode) {
+                    tech.removeTech("building tools")
+                }
                 break
         }
     }
@@ -1998,6 +2011,7 @@ document.getElementById("mod-updates").addEventListener("toggle", function () {
         }
     );
 });
+
 const sound = {
     tone(frequency, end = 1000, gain = 0.05) {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); //setup audio context
