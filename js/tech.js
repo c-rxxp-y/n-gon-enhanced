@@ -345,7 +345,49 @@ const tech = {
             }
         }
     },
-    tech: [{
+    tech: [
+    {
+        name: "building tools",
+        description: "used for building new levels",
+        maxCount: 1,
+        count: 0,
+        frequency: 0,
+        frequencyDefault: 0,
+        isSkin: true,
+        allowed() {
+            return true
+        },
+        requires: "",
+        effect() {
+            tech.isBuilderMode = 1
+            simulation.drawCursor = simulation.drawCursorBuilder
+            m.look = () => {
+                //always on mouse look
+                m.angle = Math.atan2(
+                    simulation.mouseInGame.y - m.pos.y,
+                    simulation.mouseInGame.x - m.pos.x
+                );
+                //smoothed mouse look translations
+                const scale = 1.2;
+                m.transSmoothX = canvas.width2 - m.pos.x - (simulation.mouse.x - canvas.width2) * scale;
+                m.transSmoothY = canvas.height2 - m.pos.y - (simulation.mouse.y - canvas.height2) * scale;
+                m.transX = canvas.width2 - m.pos.x - (simulation.mouse.x - canvas.width2) * scale;
+                m.transY = canvas.height2 - m.pos.y - (simulation.mouse.y - canvas.height2) * scale;
+                // m.transX += (m.transSmoothX - m.transX) * m.lookSmoothing;
+                // m.transY += (m.transSmoothY - m.transY) * m.lookSmoothing;
+            }
+            m.skin.mech();
+            m.setMovement();
+            m.coyoteCycles = 9999999999;
+        },
+        remove() {
+            if (this.count) m.resetSkin();
+            if (this.count) m.look = m.lookDefault
+            if (this.count) simulation.drawCursor = simulation.drawCursorBasic
+            tech.isBuilderMode = 0
+        }
+    },
+    {
         name: "tungsten carbide",
         description: "<strong>+500</strong> maximum <strong class='color-h'>health</strong><br><strong>lose</strong> <strong class='color-h'>health</strong> after hard <strong>landings</strong>",
         maxCount: 1,
@@ -7814,6 +7856,25 @@ const tech = {
     //************************************************** tech
     //**************************************************
     {
+        name: "poopoo crap",
+        description: "<strong>teleporting</strong> takes less <strong class='color-f'>energy</strong>",
+        isFieldTech: true,
+        maxCount: 1,
+        count: 0,
+        frequency: 2,
+        frequencyDefault: 2,
+        allowed() {
+            return m.fieldMode === 13
+        },
+        requires: "matter displacement",
+        effect() {
+            tech.isEfficientTeleport *= 0.75
+        },
+        remove() {
+            tech.isEfficientTeleport = 0
+        }
+    },
+    {
         name: "spherical harmonics",
         description: "<strong>1.5x</strong> <strong>standing wave</strong> deflection <strong class='color-f'>energy</strong> efficiency<br>shield deflection <strong>radius</strong> is stable", //<strong>standing wave</strong> oscillates in a 3rd dimension<br>
         isFieldTech: true,
@@ -12373,4 +12434,7 @@ const tech = {
     isTacticalEfficiency: null,
     isAdditionalRounds: null,
     isSniperDefense: null,
+    isEfficientTeleport: null,
+    isBlockHeal: null,
+    isBuilderMode: null,
 }
