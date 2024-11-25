@@ -5,6 +5,13 @@ making mods for the browser game n-gon (https://landgreen.github.io/n-gon/)
 add matter displacement tech
 
 # recent patch notes:
+****11/25/24****
+- new level-building related stuff
+- new building tools skin: useful tools for creating community maps
+- while in testing mode, pressing 9 and 0 spawn powerups (console command info and level warp respectively)
+- level warp powerup now has an "enhanced" section, holding mod-specific levels
+
+
 ****11/20/24****
 - new tech
 
