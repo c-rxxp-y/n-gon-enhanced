@@ -63,7 +63,7 @@ const level = {
             // spawn.bodyRect(575, -700, 150, 150);  //block mob line of site on testing
             // level.substructure();
 
-            level[simulation.isTraining ? "walk" : "initial"]() //normal starting level **************************************************
+            level[simulation.isTraining ? "walk" : "gettingOverIt"]() //normal starting level **************************************************
 
 
             // for (let i = 0; i < 5; ++i) spawn.sneaker(1900, -500)
