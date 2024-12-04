@@ -347,6 +347,30 @@ const tech = {
     },
     tech: [
     {
+        name: "randomizer",
+        description: "",
+        maxCount: 1,
+        count: 0,
+        frequency: 2,
+        frequencyDefault: 2,
+        //isInstant: true,
+        allowed() {
+            return true
+        },
+        requires: "",
+        effect() {
+            tech.isRandomizer = 1
+            addRandom = Math.ceil(Math.random() * 20)
+            if (addRandom < 5) Math.round(Math.random() * 20)
+            for (let i = 0; i < addRandom; i++) {
+                tech.giveTech('random')
+            }
+        },
+        remove() {
+            tech.isRandomizer = 0
+        }
+    },
+    {
         name: "building tools",
         description: "used for building new levels",
         maxCount: 1,
@@ -355,7 +379,7 @@ const tech = {
         frequencyDefault: 0,
         isSkin: true,
         allowed() {
-            return true
+            return (simulation.testing)
         },
         requires: "",
         effect() {
@@ -7855,25 +7879,25 @@ const tech = {
     //************************************************** field
     //************************************************** tech
     //**************************************************
-    {
-        name: "poopoo crap",
-        description: "<strong>teleporting</strong> takes less <strong class='color-f'>energy</strong>",
-        isFieldTech: true,
-        maxCount: 1,
-        count: 0,
-        frequency: 2,
-        frequencyDefault: 2,
-        allowed() {
-            return m.fieldMode === 13
-        },
-        requires: "matter displacement",
-        effect() {
-            tech.isEfficientTeleport *= 0.75
-        },
-        remove() {
-            tech.isEfficientTeleport = 0
-        }
-    },
+    // {
+    //     name: "poopoo crap",
+    //     description: "<strong>teleporting</strong> takes less <strong class='color-f'>energy</strong>",
+    //     isFieldTech: true,
+    //     maxCount: 1,
+    //     count: 0,
+    //     frequency: 2,
+    //     frequencyDefault: 2,
+    //     allowed() {
+    //         return m.fieldMode === 13
+    //     },
+    //     requires: "matter displacement",
+    //     effect() {
+    //         tech.isEfficientTeleport *= 0.75
+    //     },
+    //     remove() {
+    //         tech.isEfficientTeleport = 0
+    //     }
+    // },
     {
         name: "spherical harmonics",
         description: "<strong>1.5x</strong> <strong>standing wave</strong> deflection <strong class='color-f'>energy</strong> efficiency<br>shield deflection <strong>radius</strong> is stable", //<strong>standing wave</strong> oscillates in a 3rd dimension<br>
@@ -9259,132 +9283,132 @@ const tech = {
     //     },
     //     remove() {}
     // },
-    // {
-    //     name: "-quantum leap-",
-    //     description: "<strong style='color: #f55;'>experiment:</strong> every 20 seconds<br>become an <strong class='alt'>alternate</strong> version of yourself",
-    //     maxCount: 1,
-    //     count: 0,
-    //     frequency: 0,
-    //     isBadRandomOption: true,
-    //     isExperimentalMode: true,
-    //     allowed() {
-    //         return build.isExperimentSelection
-    //     },
-    //     requires: "",
-    //     interval: undefined,
-    //     effect() {
-    //         this.interval = setInterval(() => {
-    //             if (!build.isExperimentSelection) {
-    //                 m.switchWorlds()
-    //                 simulation.trails()
-    //             }
-    //         }, 20000); //every 20 seconds
+    {
+        name: "-quantum leap-",
+        description: "<strong style='color: #f55;'>experiment:</strong> every 20 seconds<br>become an <strong class='alt'>alternate</strong> version of yourself",
+        maxCount: 1,
+        count: 0,
+        frequency: 0,
+        isBadRandomOption: true,
+        isExperimentalMode: true,
+        allowed() {
+            return build.isExperimentSelection
+        },
+        requires: "",
+        interval: undefined,
+        effect() {
+            this.interval = setInterval(() => {
+                if (!build.isExperimentSelection) {
+                    m.switchWorlds()
+                    simulation.trails()
+                }
+            }, 20000); //every 20 seconds
 
-    //     },
-    //     remove() {
-    //         if (this.count > 0) clearTimeout(this.interval);
-    //     }
-    // },
-    // {
-    //     name: "-shields-",
-    //     description: "<strong style='color: #f55;'>experiment:</strong> every 5 seconds<br>all mobs gain a shield",
-    //     maxCount: 1,
-    //     count: 0,
-    //     frequency: 0,
-    //     isBadRandomOption: true,
-    //     isExperimentalMode: true,
-    //     allowed() {
-    //         return build.isExperimentSelection
-    //     },
-    //     requires: "",
-    //     effect() {
-    //         this.interval = setInterval(() => {
-    //             if (!build.isExperimentSelection) {
-    //                 for (let i = 0; i < mob.length; i++) {
-    //                     if (!mob[i].isShielded && !mob[i].shield && mob[i].isDropPowerUp) spawn.shield(mob[i], mob[i].position.x, mob[i].position.y, 1, true);
-    //                 }
-    //             }
-    //         }, 5000); //every 5 seconds
-    //     },
-    //     interval: undefined,
-    //     remove() {
-    //         if (this.count > 0) clearTimeout(this.interval);
-    //     }
-    // },
-    // {
-    //     name: "-Fourier analysis-",
-    //     description: "<strong style='color: #f55;'>experiment:</strong> your aiming is random",
-    //     maxCount: 1,
-    //     count: 0,
-    //     frequency: 0,
-    //     isBadRandomOption: true,
-    //     isExperimentalMode: true,
-    //     allowed() {
-    //         return build.isExperimentSelection && !m.isShipMode
-    //     },
-    //     requires: "not ship",
-    //     effect() {
-    //         m.look = () => {
-    //             m.angle = 2 * Math.sin(m.cycle * 0.0133) + Math.sin(m.cycle * 0.013) + 0.5 * Math.sin(m.cycle * 0.031) + 0.33 * Math.sin(m.cycle * 0.03)
-    //             const scale = 0.8;
-    //             m.transSmoothX = canvas.width2 - m.pos.x - (simulation.mouse.x - canvas.width2) * scale;
-    //             m.transSmoothY = canvas.height2 - m.pos.y - (simulation.mouse.y - canvas.height2) * scale;
-    //             m.transX += (m.transSmoothX - m.transX) * 0.07;
-    //             m.transY += (m.transSmoothY - m.transY) * 0.07;
-    //         }
-    //     },
-    //     remove() {
-    //         if (this.count > 0) m.look = m.lookDefault()
-    //     }
-    // },
-    // {
-    //     name: "-panopticon-",
-    //     description: "<strong style='color: #f55;'>experiment:</strong> mobs can always see you",
-    //     maxCount: 1,
-    //     count: 0,
-    //     frequency: 0,
-    //     isBadRandomOption: true,
-    //     isExperimentalMode: true,
-    //     allowed() {
-    //         return build.isExperimentSelection
-    //     },
-    //     requires: "",
-    //     effect() {
-    //         this.interval = setInterval(() => {
-    //             if (!build.isExperimentSelection) {
-    //                 for (let i = 0; i < mob.length; i++) {
-    //                     if (!mob[i].shield && mob[i].isDropPowerUp) {
-    //                         mob[i].locatePlayer()
-    //                         mob[i].seePlayer.yes = true;
-    //                     }
-    //                 }
-    //             }
-    //         }, 1000); //every 1 seconds
-    //     },
-    //     interval: undefined,
-    //     remove() {
-    //         if (this.count > 0) clearTimeout(this.interval);
-    //     }
-    // },
-    // {
-    //     name: "-decomposers-",
-    //     description: "<strong style='color: #f55;'>experiment:</strong> after they die<br>mobs leave behind spawns",
-    //     maxCount: 1,
-    //     count: 0,
-    //     frequency: 0,
-    //     isBadRandomOption: true,
-    //     isExperimentalMode: true,
-    //     allowed() {
-    //         return build.isExperimentSelection
-    //     },
-    //     requires: "",
-    //     effect() {
-    //         tech.deathSpawns = 0.2
-    //     },
-    //     remove() {
-    //         tech.deathSpawns = 0
-    //     }
-    // },
+        },
+        remove() {
+            if (this.count > 0) clearTimeout(this.interval);
+        }
+    },
+    {
+        name: "-shields-",
+        description: "<strong style='color: #f55;'>experiment:</strong> every 5 seconds<br>all mobs gain a shield",
+        maxCount: 1,
+        count: 0,
+        frequency: 0,
+        isBadRandomOption: true,
+        isExperimentalMode: true,
+        allowed() {
+            return build.isExperimentSelection
+        },
+        requires: "",
+        effect() {
+            this.interval = setInterval(() => {
+                if (!build.isExperimentSelection) {
+                    for (let i = 0; i < mob.length; i++) {
+                        if (!mob[i].isShielded && !mob[i].shield && mob[i].isDropPowerUp) spawn.shield(mob[i], mob[i].position.x, mob[i].position.y, 1, true);
+                    }
+                }
+            }, 5000); //every 5 seconds
+        },
+        interval: undefined,
+        remove() {
+            if (this.count > 0) clearTimeout(this.interval);
+        }
+    },
+    {
+        name: "-Fourier analysis-",
+        description: "<strong style='color: #f55;'>experiment:</strong> your aiming is random",
+        maxCount: 1,
+        count: 0,
+        frequency: 0,
+        isBadRandomOption: true,
+        isExperimentalMode: true,
+        allowed() {
+            return build.isExperimentSelection && !m.isShipMode
+        },
+        requires: "not ship",
+        effect() {
+            m.look = () => {
+                m.angle = 2 * Math.sin(m.cycle * 0.0133) + Math.sin(m.cycle * 0.013) + 0.5 * Math.sin(m.cycle * 0.031) + 0.33 * Math.sin(m.cycle * 0.03)
+                const scale = 0.8;
+                m.transSmoothX = canvas.width2 - m.pos.x - (simulation.mouse.x - canvas.width2) * scale;
+                m.transSmoothY = canvas.height2 - m.pos.y - (simulation.mouse.y - canvas.height2) * scale;
+                m.transX += (m.transSmoothX - m.transX) * 0.07;
+                m.transY += (m.transSmoothY - m.transY) * 0.07;
+            }
+        },
+        remove() {
+            if (this.count > 0) m.look = m.lookDefault()
+        }
+    },
+    {
+        name: "-panopticon-",
+        description: "<strong style='color: #f55;'>experiment:</strong> mobs can always see you",
+        maxCount: 1,
+        count: 0,
+        frequency: 0,
+        isBadRandomOption: true,
+        isExperimentalMode: true,
+        allowed() {
+            return build.isExperimentSelection
+        },
+        requires: "",
+        effect() {
+            this.interval = setInterval(() => {
+                if (!build.isExperimentSelection) {
+                    for (let i = 0; i < mob.length; i++) {
+                        if (!mob[i].shield && mob[i].isDropPowerUp) {
+                            mob[i].locatePlayer()
+                            mob[i].seePlayer.yes = true;
+                        }
+                    }
+                }
+            }, 1000); //every 1 seconds
+        },
+        interval: undefined,
+        remove() {
+            if (this.count > 0) clearTimeout(this.interval);
+        }
+    },
+    {
+        name: "-decomposers-",
+        description: "<strong style='color: #f55;'>experiment:</strong> after they die<br>mobs leave behind spawns",
+        maxCount: 1,
+        count: 0,
+        frequency: 0,
+        isBadRandomOption: true,
+        isExperimentalMode: true,
+        allowed() {
+            return build.isExperimentSelection
+        },
+        requires: "",
+        effect() {
+            tech.deathSpawns = 0.2
+        },
+        remove() {
+            tech.deathSpawns = 0
+        }
+    },
 
 
 
@@ -12437,4 +12461,5 @@ const tech = {
     isEfficientTeleport: null,
     isBlockHeal: null,
     isBuilderMode: null,
+    isRandomizer: null,
 }
