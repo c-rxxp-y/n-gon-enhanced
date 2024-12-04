@@ -249,7 +249,7 @@ const powerUps = {
             simulation.inGameConsole(text);
         } else if (type === "field") {
             m.setField(index)
-        } else if (type === "tech") {
+        } else if (type === "tech" && !tech.isRandomizer) {
             simulation.inGameConsole(`<div class="circle-grid tech"></div> &nbsp; <span class='color-var'>tech</span>.giveTech("<strong class='color-text'>${tech.tech[index].name}</strong>")`);
             tech.giveTech(index)
         }
