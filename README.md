@@ -5,6 +5,13 @@ making mods for the browser game n-gon (https://landgreen.github.io/n-gon/)
 add matter displacement tech
 
 # recent patch notes:
+****12/4/24****
+- randomizer tech/mode
+- pick randomizer in expirement mode
+- ****effects:****
+- you get a random amount of random tech
+- you cant get new tech from orbs (still lets you pick them up)
+
 ****11/25/24****
 - new level-building related stuff
 - new building tools skin: useful tools for creating community maps
