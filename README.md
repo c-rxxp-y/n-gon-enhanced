@@ -5,6 +5,13 @@ making mods for the browser game n-gon (https://landgreen.github.io/n-gon/)
 add matter displacement tech
 
 # recent patch notes:
+****12/5/24****
+- fixed builder tools glitch: now only available in experiment mode
+- updated randomizer to be a junk tech, and to also randomize guns
+
+*note: when using randomizer, selecting any tech/guns from their respective orbs will not add them to your inventory*
+*you are stuck with what you get (other than field)*
+
 ****12/4/24****
 - randomizer tech/mode
 - pick randomizer in expirement mode
