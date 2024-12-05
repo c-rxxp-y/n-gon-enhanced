@@ -239,7 +239,7 @@ const powerUps = {
         }
     },
     choose(type, index) {
-        if (type === "gun") {
+        if (type === "gun" && !tech.isRandomizer) {
             b.giveGuns(index)
             let text = `<div class="circle-grid gun"></div> &nbsp; b.giveGuns("<strong class='color-text'>${b.guns[index].name}</strong>")`
             if (b.inventory.length === 1) text += `<br>input.key.gun<span class='color-symbol'>:</span> ["<span class='color-text'>MouseLeft</span>"]`
