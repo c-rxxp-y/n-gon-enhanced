@@ -353,18 +353,24 @@ const tech = {
         count: 0,
         frequency: 2,
         frequencyDefault: 2,
+        isJunk: true,
         //isInstant: true,
         allowed() {
-            return true
+            return true //build.isExperimentSelection
         },
         requires: "",
         effect() {
             tech.isRandomizer = 1
-            addRandom = Math.ceil(Math.random() * 20)
-            if (addRandom < 5) Math.round(Math.random() * 20)
-            for (let i = 0; i < addRandom; i++) {
+            addRandomGun = Math.ceil(Math.random() * 6);
+            addRandomTech = Math.ceil(Math.random() * 20);
+            if (addRandomTech < 5) Math.round(Math.random() * 20);
+            if (addRandomGun < 1) Math.round(Math.random() * 6);
+            for (let i = 0; i < addRandomGun; i++) {
+                b.giveGuns();
+            };
+            for (let i = 0; i < addRandomTech; i++) {
                 tech.giveTech('random')
-            }
+            };
         },
         remove() {
             tech.isRandomizer = 0
@@ -379,7 +385,7 @@ const tech = {
         frequencyDefault: 0,
         isSkin: true,
         allowed() {
-            return (simulation.testing)
+            return (build.isExperimentSelection === true)
         },
         requires: "",
         effect() {
