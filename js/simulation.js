@@ -410,6 +410,17 @@ const simulation = {
         ctx.lineTo(simulation.mouse.x, simulation.mouse.y + size);
         ctx.stroke(); // Draw it
     },
+    drawCursorBuilder() {
+        const size = 2000;
+        ctx.beginPath();
+        ctx.moveTo(simulation.mouse.x - size, simulation.mouse.y);
+        ctx.lineTo(simulation.mouse.x + size, simulation.mouse.y);
+        ctx.moveTo(simulation.mouse.x, simulation.mouse.y - size);
+        ctx.lineTo(simulation.mouse.x, simulation.mouse.y + size);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "#000"; //'rgba(0,0,0,0.4)'
+        ctx.stroke(); // Draw it
+    },
     drawList: [], //so you can draw a first frame of explosions.. I know this is bad
     drawTime: 8, //how long circles are drawn.  use to push into drawlist.time
     mobDmgColor: "rgba(255,0,0,0.7)", //color when a mob damages the player  // set by mass-energy tech
@@ -2118,9 +2129,6 @@ const simulation = {
                 simulation.setZoom(simulation.zoomScale * 0.9)
             }
         });
-
-
-
 
         //undo last element added after you press z
         document.body.addEventListener("keydown", (event) => { // e.keyCode   z=90  m=77 b=66  shift = 16  c = 67
