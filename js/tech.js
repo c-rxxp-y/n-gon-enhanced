@@ -348,7 +348,7 @@ const tech = {
     tech: [
     {
         name: "randomizer",
-        description: "",
+        description: "when selected, all tech and guns is <strong>randomized</strong><br>you cant select new tech or guns<br><strong>permanent",
         maxCount: 1,
         count: 0,
         frequency: 2,
@@ -374,6 +374,25 @@ const tech = {
         },
         remove() {
             tech.isRandomizer = 0
+        }
+    },
+    {
+        name: "actuated pistons",
+        description: "jump height is determined by <strong class='color-f'>energy</strong><br>higher <strong class='color-f'>energy</strong>, higher jumps",
+        maxCount: 1,
+        count: 0,
+        frequency: 1,
+        frequencyDefault: 1,
+        isSkin: true,
+        allowed() {
+            return !m.isAltSkin
+        },
+        requires: "not skin",
+        effect() {
+            m.skin.jumper()
+        },
+        remove() {
+            if (this.count) m.resetSkin();
         }
     },
     {
